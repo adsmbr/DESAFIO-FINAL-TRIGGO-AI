@@ -1,6 +1,7 @@
 name: 'covid_2021'
 version: '1.0.0'
 config-version: 2
+
 profile: 'default'
 
 model-paths: ["models"]
@@ -8,48 +9,32 @@ analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
 
+target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
+
+models:
+  covid_2021:
+    +materialized: view
+    +schema: gold
+
+    dimensions:
+      +materialized: table
+      +schema: dimensions
+
+    facts:
+      +materialized: incremental
+      +schema: facts
+
+    staging:
+      +materialized: view
+      +schema: bronze
 
 on-run-start:
   - "{{ log('Iniciando execução do dbt em ' ~ run_started_at, info=true) }}"
 
 on-run-end:
   - "{{ log('Execução do dbt finalizada em ' ~ run_started_at, info=true) }}"
-
-models:
-  covid_2021:
-    # Configurações padrão para todos os modelos
-    # O schema padrão para todos os modelos dentro deste projeto será 'gold'
-    # A menos que seja sobrescrito por uma configuração mais específica.
-    +schema: gold
-    +materialized: view
-
-    staging:
-      # Modelos na pasta 'staging' usarão o schema 'bronze'
-      +schema: bronze
-      +materialized: view
-
-    dimensions:
-      # Modelos na pasta 'dimensions' usarão o schema 'gold' (herdado do nível superior)
-      +materialized: table
-
-    facts:
-      # Modelos na pasta 'facts' usarão o schema 'gold' (herdado do nível superior)
-      +materialized: incremental
-      +unique_key: "_ID"
-      +merge_update_columns:
-        - 'OCUPACAO_SUSPEITO_CLI'
-        - 'OCUPACAO_SUSPEITO_UTI'
-        - 'OCUPACAO_CONFIRMADO_CLI'
-        - 'OCUPACAO_CONFIRMADO_UTI'
-        - 'OCUPACAO_COVID_UTI'
-        - 'OCUPACAO_COVID_CLI'
-        - 'OCUPACAO_HOSPITALAR_UTI'
-        - 'OCUPACAO_HOSPITALAR_CLI'
-        - 'SAIDA_SUSPEITA_OBITOS'
-        - 'SAIDA_SUSPEITA_ALTAS'
-        - 'SAIDA_CONFIRMADA_OBITOS'
-        - 'SAIDA_CONFIRMADA_ALTAS'
