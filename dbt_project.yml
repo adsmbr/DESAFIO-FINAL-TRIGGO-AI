@@ -16,22 +16,32 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# ===================================================================
+# INÍCIO DA SEÇÃO 'MODELS' CORRIGIDA
+# Esta é a configuração que diz ao dbt para colocar os modelos
+# de cada pasta no schema correto do Snowflake (BRONZE ou GOLD).
+# ===================================================================
 models:
+  # O nome do seu projeto dbt
   covid_2021:
-    +materialized: view
-    +schema: gold
-
-    dimensions:
-      +materialized: table
-      +schema: dimensions
-
-    facts:
-      +materialized: incremental
-      +schema: facts
-
+    
+    # Modelos na pasta "staging" irão para o schema BRONZE
     staging:
       +materialized: view
       +schema: bronze
+
+    # Modelos na pasta "dimensions" irão para o schema GOLD
+    dimensions:
+      +materialized: table
+      +schema: gold
+
+    # Modelos na pasta "facts" irão para o schema GOLD
+    facts:
+      +materialized: incremental
+      +schema: gold
+# ===================================================================
+# FIM DA SEÇÃO 'MODELS'
+# ===================================================================
 
 on-run-start:
   - "{{ log('Iniciando execução do dbt em ' ~ run_started_at, info=true) }}"
