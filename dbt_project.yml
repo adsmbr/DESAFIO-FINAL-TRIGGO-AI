@@ -17,9 +17,10 @@ clean-targets:
   - "dbt_packages"
 
 # ===================================================================
-# SEÇÃO 'MODELS' CORRIGIDA E FINAL
-# Esta é a configuração que mapeia suas pastas para os schemas corretos
-# e define a materialização ideal para cada camada.
+# SEÇÃO 'MODELS' FINAL E CORRETA
+# A macro 'generate_schema_name.sql' é automaticamente usada
+# para interpretar os schemas abaixo. Não é necessário
+# nenhuma configuração adicional.
 # ===================================================================
 models:
   covid_2021:
