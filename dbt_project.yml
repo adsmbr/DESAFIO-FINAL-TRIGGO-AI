@@ -17,28 +17,29 @@ clean-targets:
   - "dbt_packages"
 
 # ===================================================================
-# INÍCIO DA SEÇÃO 'MODELS' CORRIGIDA E FINAL
-# Esta é a configuração que mapeia suas pastas para os schemas corretos.
+# SEÇÃO 'MODELS' CORRIGIDA E FINAL
+# Esta é a configuração que mapeia suas pastas para os schemas corretos
+# e define a materialização ideal para cada camada.
 # ===================================================================
 models:
   covid_2021:
     
-    # Modelos na pasta "staging" irão para o schema BRONZE
+    # Modelos na pasta "staging" irão para o schema BRONZE como views
     staging:
       +materialized: view
       +schema: bronze
 
-    # Modelos na pasta "intermediate" irão para o schema SILVER
+    # Modelos na pasta "intermediate" irão para o schema SILVER como views
     intermediate:
       +materialized: view
       +schema: silver
 
-    # Modelos na pasta "dimensions" irão para o schema GOLD
+    # Modelos na pasta "dimensions" irão para o schema GOLD como tabelas
     dimensions:
       +materialized: table
       +schema: gold
 
-    # Modelos na pasta "facts" irão para o schema GOLD
+    # Modelos na pasta "facts" irão para o schema GOLD como tabelas
     facts:
       +materialized: table
       +schema: gold
