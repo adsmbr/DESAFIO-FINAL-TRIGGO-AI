@@ -16,35 +16,26 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# ===================================================================
-# INÍCIO DA SEÇÃO 'MODELS' CORRIGIDA E FINAL
-# Esta é a configuração que mapeia suas pastas para os schemas corretos.
-# ===================================================================
 models:
   covid_2021:
-    
-    # Modelos na pasta "staging" irão para o schema BRONZE
+    +materialized: view       # padrão geral (se não sobrescrito)
+    +schema: gold             # padrão geral para schema gold
+
+    dimensions:
+      +materialized: table
+      +schema: dimensions
+
+    facts:
+      +materialized: incremental
+      +schema: facts
+
     staging:
       +materialized: view
       +schema: bronze
 
-    # Modelos na pasta "intermediate" irão para o schema SILVER
     intermediate:
-      +materialized: view
+      +materialized: table    # Silver como tabela física (mais performance)
       +schema: silver
-
-    # Modelos na pasta "dimensions" irão para o schema GOLD
-    dimensions:
-      +materialized: table
-      +schema: gold
-
-    # Modelos na pasta "facts" irão para o schema GOLD
-    facts:
-      +materialized: table
-      +schema: gold
-# ===================================================================
-# FIM DA SEÇÃO 'MODELS'
-# ===================================================================
 
 on-run-start:
   - "{{ log('Iniciando execução do dbt em ' ~ run_started_at, info=true) }}"
