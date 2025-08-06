@@ -1,4 +1,4 @@
-name: 'covid_2021'
+name: 'COVID19'
 version: '1.0.0'
 config-version: 2
 
@@ -16,40 +16,20 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# ===================================================================
-# SEÇÃO 'MODELS' FINAL E CORRETA
-# A macro 'generate_schema_name.sql' é automaticamente usada
-# para interpretar os schemas abaixo. Não é necessário
-# nenhuma configuração adicional.
-# ===================================================================
 models:
-  covid_2021:
-    
-    # Modelos na pasta "staging" irão para o schema BRONZE como views
+  COVID19:
     staging:
       +materialized: view
       +schema: bronze
 
-    # Modelos na pasta "intermediate" irão para o schema SILVER como views
     intermediate:
-      +materialized: view
+      +materialized: table
       +schema: silver
 
-    # Modelos na pasta "dimensions" irão para o schema GOLD como tabelas
     dimensions:
       +materialized: table
       +schema: gold
 
-    # Modelos na pasta "facts" irão para o schema GOLD como tabelas
     facts:
-      +materialized: table
+      +materialized: incremental
       +schema: gold
-# ===================================================================
-# FIM DA SEÇÃO 'MODELS'
-# ===================================================================
-
-on-run-start:
-  - "{{ log('Iniciando execução do dbt em ' ~ run_started_at, info=true) }}"
-
-on-run-end:
-  - "{{ log('Execução do dbt finalizada em ' ~ run_started_at, info=true) }}"
