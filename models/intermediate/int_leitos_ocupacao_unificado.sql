@@ -4,7 +4,7 @@
 -- as chaves das dimensões antes de carregar a tabela de fatos.
 
 WITH staging_data AS (
-    SELECT * FROM {{ ref('stg_leito_ocupacao_2021') }}
+    SELECT * FROM {{ ref('stg_leito_ocupacao_consolidado') }}
 ),
 
 dim_localidade AS (
