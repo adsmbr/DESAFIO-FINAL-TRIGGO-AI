@@ -2,7 +2,7 @@
 WITH datas_distintas AS (
     -- Pega todas as datas únicas dos seus dados de leitos
     SELECT DISTINCT CAST(data_notificacao AS DATE) AS data
-    FROM {{ ref('stg_leito_ocupacao_2021') }}
+    FROM {{ ref('stg_leito_ocupacao_consolidado') }}
 )
 SELECT
     -- Cria um ID numérico para a data (ex: 20210131)

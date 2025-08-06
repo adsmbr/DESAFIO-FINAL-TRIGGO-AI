@@ -16,7 +16,7 @@ cnes_nos_dados AS (
     SELECT DISTINCT
         cnes AS id_cnes
     FROM
-         {{ ref('stg_leito_ocupacao_2021') }}
+         {{ ref('stg_leito_ocupacao_consolidado') }}
     WHERE
         cnes IS NOT NULL
 )

@@ -1,14 +1,12 @@
-# models/covid_2021/staging/sources.yml
 version: 2
 
 sources:
-  - name: bronze_source # Um nome para o seu grupo de fontes
+  - name: bronze_source # Seu grupo de fontes existente
     database: COVID_2021
-    schema: BRONZE
+    schema: BRONZE # O esquema onde as tabelas brutas estão
     tables:
-      # IMPORTANTE: Substitua o nome abaixo pelo nome REAL da sua tabela bruta no Snowflake
       - name: 'RAW_LEITO_OCUPACAO_2021'
-
-       # Adicione aqui as outras tabelas brutas (municipios, cnes) quando as carregar
       - name: 'RAW_MUNICIPIOS_IBGE'
-      - name: 'RAW_ESTABELECIMENTOS_CNES' # <-- A tabela que acabamos de carregar
+      - name: 'RAW_ESTABELECIMENTOS_CNES'
+      - name: 'RAW_LEITO_OCUPACAO_2020' # NOVO: Tabela bruta de 2020
+      - name: 'RAW_LEITO_OCUPACAO_2022' # NOVO: Tabela bruta de 2022
