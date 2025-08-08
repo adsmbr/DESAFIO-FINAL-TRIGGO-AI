@@ -1140,5 +1140,5 @@ LIMIT 5;
 Insight: Esta consulta identifica os cinco hospitais com a maior taxa de altas confirmadas em 2021. Essa informação é vital para entender a eficiência e o sucesso de tratamentos em diferentes unidades de saúde, permitindo a identificação de melhores práticas.
 
 9. Link para o dbt Docs gerado
-(https://xk395.us1.dbt.com/accounts/70471823483161/develop/70471824053319/docs/index.html#!/overview/dbt_utils)
+https://xk395.us1.dbt.com/accounts/70471823483161/develop/70471824053319/docs/index.html#!/overview
 
