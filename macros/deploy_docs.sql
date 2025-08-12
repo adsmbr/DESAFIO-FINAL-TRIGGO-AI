@@ -1,19 +1,25 @@
 {% macro deploy_docs() %}
-  {{ log("Running deploy_docs macro", info=True) }}
+  {{ log("Iniciando o deploy da documentação...", info=True) }}
 
-  {# 1. Comando principal do dbt para rodar o pipeline e gerar a documentação. #}
-  {{ dbt_utils.run_shell_command(command="dbt build --full-refresh && dbt docs generate") }}
+  {# Executa o pipeline completo do dbt e a geração da documentação #}
+  {% do run_shell_command('dbt build --full-refresh') %}
+  {% do run_shell_command('dbt docs generate') %}
 
-  {# 2. Configura o git com seu email e nome (opcional, mas boa prática). #}
-  {{ dbt_utils.run_shell_command(command="git config user.email 'alissonmontijo@gmail.com'") }}
-  {{ dbt_utils.run_shell_command(command="git config user.name 'adsmbr'") }}
+  {# Configura as credenciais Git no ambiente de execução #}
+  {% do run_shell_command('git config user.email "alissonmontijo@gmail.com"') %}
+  {% do run_shell_command('git config user.name "adsmbr"') %}
 
-  {# 3. Adiciona todos os arquivos da documentação na pasta 'target'. #}
-  {{ dbt_utils.run_shell_command(command="git add target/") }}
-  {{ dbt_utils.run_shell_command(command="git commit -m 'feat: Generate dbt docs'") }}
+  {# Adiciona os arquivos da documentação e faz o commit #}
+  {% do run_shell_command('git add target/') %}
+  {% do run_shell_command('git commit -m "feat: Gerar documentação do dbt"') %}
 
-  {# 4. Usa o token de acesso para fazer um push forçado para a branch gh-pages. #}
-  {{ dbt_utils.run_shell_command(command="git push -f https://DBT_GITHUB_TOKEN:" + env_var('DBT_GITHUB_TOKEN') + "@github.com/adsmbr/DESAFIO-FINAL-TRIGGO-AI.git gh-pages") }}
+  {# Faz o push para a branch gh-pages usando o token de ambiente #}
+  {% do run_shell_command('git push -f https://DBT_GITHUB_TOKEN:' ~ env_var('DBT_GITHUB_TOKEN') ~ '@github.com/adsmbr/DESAFIO-FINAL-TRIGGO-AI.git gh-pages') %}
 
-  {{ log("Deploy da documentação concluído.", info=True) }}
+  {{ log("Deploy da documentação concluído com sucesso!", info=True) }}
+{% endmacro %}
+
+{% macro run_shell_command(command) %}
+  {% do log('Executando comando: ' ~ command, info=True) %}
+  {% do adapter.run_shell_command(command=command) %}
 {% endmacro %}
