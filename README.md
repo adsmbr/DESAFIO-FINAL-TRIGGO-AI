@@ -39,7 +39,7 @@ Tabelas de Fatos: Contêm as "métricas" ou números que queremos analisar (ex: 
 Tabelas de Dimensão: Fornecem o "contexto" para as métricas (ex: informações sobre a data, o hospital, a localização, o tipo de ocupação).
 Objetivo: Ser a camada que as pessoas de negócio (analistas, gestores) usam diretamente para criar os seus relatórios, gráficos e tomar decisões, sem precisar entender a complexidade dos dados brutos.
 
-```mermaid
+```sql
 graph LR
 A[Dados Brutos Originais (2020, 2021, 2022)] --> B(Esquema BRONZE);
 B -- Limpeza e Padronização por Ano --> C(Consolidação de Anos);
