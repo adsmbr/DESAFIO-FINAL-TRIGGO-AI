@@ -20,6 +20,6 @@
 {% endmacro %}
 
 {% macro run_shell_command(command) %}
-  {% do log('Executando comando: ' ~ command, info=True) %}
-  {% do adapter.run_shell_command(command=command) %}
+  {{ log('Executando comando: ' ~ command, info=True) }}
+  {{ dbt_utils.run_shell_command(command=command) }}
 {% endmacro %}
