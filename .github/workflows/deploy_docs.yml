@@ -23,14 +23,14 @@ jobs:
           pip install dbt-snowflake
           dbt deps
 
-      # --- NOVO PASSO ADICIONADO AQUI ---
       - name: Create dbt profiles.yml
         run: |
           mkdir -p ~/.dbt
           echo "config:" > ~/.dbt/profiles.yml
           echo "  send_anonymous_usage_stats: False" >> ~/.dbt/profiles.yml
           echo "" >> ~/.dbt/profiles.yml
-          echo "COVID19:" >> ~/.dbt/profiles.yml
+          # --- A ÚNICA MUDANÇA É AQUI ---
+          echo "default:" >> ~/.dbt/profiles.yml # MUDADO DE 'COVID19:' PARA 'default:'
           echo "  target: dev" >> ~/.dbt/profiles.yml
           echo "  outputs:" >> ~/.dbt/profiles.yml
           echo "    dev:" >> ~/.dbt/profiles.yml
