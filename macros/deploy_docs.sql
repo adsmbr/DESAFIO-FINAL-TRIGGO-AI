@@ -1,25 +1,27 @@
 {% macro deploy_docs() %}
   {{ log("Iniciando o deploy da documentação...", info=True) }}
 
-  {# Executa o pipeline completo do dbt e a geração da documentação #}
-  {% do run_shell_command('dbt build --full-refresh') %}
-  {% do run_shell_command('dbt docs generate') %}
+  {# Passo 1: Gera os artefatos da documentação. #}
+  {% do run_query('dbt docs generate') %}
+  {{ log("Documentação gerada com sucesso.", info=True) }}
 
-  {# Configura as credenciais Git no ambiente de execução #}
-  {% do run_shell_command('git config user.email "alissonmontijo@gmail.com"') %}
-  {% do run_shell_command('git config user.name "adsmbr"') %}
+  {# Passo 2: Configura as credenciais do Git para o commit. #}
+  {% do dbt_utils.run_shell_command('git config --global user.email "alissonmontijo@gmail.com"') %}
+  {% do dbt_utils.run_shell_command('git config --global user.name "adsmbr"') %}
+  {{ log("Configuração do Git concluída.", info=True) }}
 
-  {# Adiciona os arquivos da documentação e faz o commit #}
-  {% do run_shell_command('git add target/') %}
-  {% do run_shell_command('git commit -m "feat: Gerar documentação do dbt"') %}
+  {# Passo 3: Faz o checkout para uma branch temporária para isolar o processo. #}
+  {% do dbt_utils.run_shell_command('git checkout -b gh-pages-temp') %}
 
-  {# Faz o push para a branch gh-pages usando o token de ambiente #}
-  {% do run_shell_command('git push -f https://DBT_GITHUB_TOKEN:' ~ env_var('DBT_GITHUB_TOKEN') ~ '@github.com/adsmbr/DESAFIO-FINAL-TRIGGO-AI.git gh-pages') %}
+  {# Passo 4: Adiciona a pasta 'target' (que contém a documentação) e faz o commit. #}
+  {% do dbt_utils.run_shell_command('git add target/') %}
+  {% do dbt_utils.run_shell_command('git commit -m "feat: Gerar documentação do dbt via dbt Cloud" --allow-empty') %}
+  {{ log("Commit da documentação realizado.", info=True) }}
 
-  {{ log("Deploy da documentação concluído com sucesso!", info=True) }}
-{% endmacro %}
+  {# Passo 5: Faz o push forçado para a branch 'gh-pages' do seu repositório. #}
+  {% set repo_url = 'https://' ~ env_var('DBT_GITHUB_TOKEN' ) ~ '@github.com/adsmbr/DESAFIO-FINAL-TRIGGO-AI.git' %}
+  {% do dbt_utils.run_shell_command('git push --force ' ~ repo_url ~ ' gh-pages-temp:gh-pages') %}
 
-{% macro run_shell_command(command) %}
-  {{ log('Executando comando: ' ~ command, info=True) }}
-  {{ dbt_utils.run_shell_command(command=command) }}
+  {{ log("Deploy da documentação no GitHub Pages concluído com sucesso!", info=True) }}
+
 {% endmacro %}
