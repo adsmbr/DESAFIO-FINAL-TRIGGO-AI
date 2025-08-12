@@ -29,8 +29,7 @@ jobs:
           echo "config:" > ~/.dbt/profiles.yml
           echo "  send_anonymous_usage_stats: False" >> ~/.dbt/profiles.yml
           echo "" >> ~/.dbt/profiles.yml
-          # --- A ÚNICA MUDANÇA É AQUI ---
-          echo "default:" >> ~/.dbt/profiles.yml # MUDADO DE 'COVID19:' PARA 'default:'
+          echo "default:" >> ~/.dbt/profiles.yml
           echo "  target: dev" >> ~/.dbt/profiles.yml
           echo "  outputs:" >> ~/.dbt/profiles.yml
           echo "    dev:" >> ~/.dbt/profiles.yml
@@ -44,8 +43,12 @@ jobs:
           echo "      schema: dummy" >> ~/.dbt/profiles.yml
           echo "      threads: 1" >> ~/.dbt/profiles.yml
 
+      # --- MUDANÇA PRINCIPAL AQUI ---
+      # Trocamos um único 'dbt docs generate' por dois comandos: 'dbt parse' e depois 'dbt docs generate'.
       - name: Generate dbt docs
-        run: dbt docs generate
+        run: |
+          dbt parse --no-strict
+          dbt docs generate --no-compile
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
