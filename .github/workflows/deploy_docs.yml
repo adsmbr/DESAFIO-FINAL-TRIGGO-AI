@@ -1,11 +1,9 @@
 name: Deploy dbt Docs to GitHub Pages
 
 on:
-  # Roda este workflow toda vez que houver um push na branch 'main'
   push:
     branches:
       - main
-  # Permite que você rode este workflow manualmente pela aba Actions do GitHub
   workflow_dispatch:
 
 jobs:
@@ -25,6 +23,27 @@ jobs:
           pip install dbt-snowflake
           dbt deps
 
+      # --- NOVO PASSO ADICIONADO AQUI ---
+      - name: Create dbt profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          echo "config:" > ~/.dbt/profiles.yml
+          echo "  send_anonymous_usage_stats: False" >> ~/.dbt/profiles.yml
+          echo "" >> ~/.dbt/profiles.yml
+          echo "COVID19:" >> ~/.dbt/profiles.yml
+          echo "  target: dev" >> ~/.dbt/profiles.yml
+          echo "  outputs:" >> ~/.dbt/profiles.yml
+          echo "    dev:" >> ~/.dbt/profiles.yml
+          echo "      type: snowflake" >> ~/.dbt/profiles.yml
+          echo "      account: dummy" >> ~/.dbt/profiles.yml
+          echo "      user: dummy" >> ~/.dbt/profiles.yml
+          echo "      password: dummy" >> ~/.dbt/profiles.yml
+          echo "      role: dummy" >> ~/.dbt/profiles.yml
+          echo "      database: dummy" >> ~/.dbt/profiles.yml
+          echo "      warehouse: dummy" >> ~/.dbt/profiles.yml
+          echo "      schema: dummy" >> ~/.dbt/profiles.yml
+          echo "      threads: 1" >> ~/.dbt/profiles.yml
+
       - name: Generate dbt docs
         run: dbt docs generate
 
@@ -37,4 +56,3 @@ jobs:
           force_orphan: true
           user_name: 'adsmbr'
           user_email: 'alissonmontijo@gmail.com'
-
