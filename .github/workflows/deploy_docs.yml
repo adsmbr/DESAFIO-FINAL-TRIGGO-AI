@@ -1,0 +1,40 @@
+name: Deploy dbt Docs to GitHub Pages
+
+on:
+  # Roda este workflow toda vez que houver um push na branch 'main'
+  push:
+    branches:
+      - main
+  # Permite que você rode este workflow manualmente pela aba Actions do GitHub
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt and dependencies
+        run: |
+          pip install dbt-snowflake
+          dbt deps
+
+      - name: Generate dbt docs
+        run: dbt docs generate
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DBT_GITHUB_TOKEN }}
+          publish_dir: ./target
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'adsmbr'
+          user_email: 'alissonmontijo@gmail.com'
+
