@@ -1,13 +1,13 @@
-Projeto COVID19: Análise de Ocupação de Leitos
+# Projeto COVID19: Análise de Ocupação de Leitos
 
-1. Visão Geral do Projeto
+## 1. Visão Geral do Projeto
 
 Este projeto foi desenvolvido como solução para o desafio de engenharia de dados da Health Insights Brasil. O objetivo é transformar dados brutos de ocupação de leitos hospitalares do DataSUS, referentes aos anos de 2020, 2021 e 2022, em uma fonte de dados confiável, organizada e performática.
 
 A solução implementa um pipeline de dados completo que ingere, transforma e modela os dados utilizando Snowflake como Data Warehouse e dbt (data build tool) para a transformação e modelagem, seguindo as melhores práticas de engenharia de dados.
 O resultado final é um Modelo Dimensional (Star Schema) na camada GOLD, pronto para ser consumido por ferramentas de BI, permitindo que analistas e gestores de saúde pública extraiam insights acionáveis sobre a pandemia de COVID-19.
 
-1.1 O Que é Este Projeto?
+### 1.1 O Que é Este Projeto?
 
 Imagine que temos uma montanha de dados sobre leitos hospitalares de vários anos, vindos de diferentes fontes e um pouco desorganizados. Este projeto funciona como um "grande organizador inteligente" para esses dados. Ele usa uma ferramenta chamada dbt (que significa "data build tool", ou "ferramenta de construção de dados") para:
 
@@ -18,40 +18,42 @@ Imagine que temos uma montanha de dados sobre leitos hospitalares de vários ano
 
 O objetivo final é ter um conjunto de dados único, confiável e fácil de consultar para entender a situação dos leitos hospitalares ao longo do tempo (2020, 2021 e 2022).
 
-2. A Arquitetura de Dados: As "Camadas de Organização"
+## 2. A Arquitetura de Dados: As "Camadas de Organização"
 
 Para garantir que os dados são sempre de alta qualidade e fáceis de gerenciar, o projeto segue uma estratégia de organização em três "camadas". Pense nelas como diferentes estágios de refinamento dos dados:
 
-a) Camada BRONZE (Staging - "Estágio Inicial")
+*   **a) Camada BRONZE (Staging - "Estágio Inicial")
 Onde os dados ficam: Em um local específico no seu banco de dados (chamado "esquema") que nomeamos BRONZE.
 O que acontece aqui: É o primeiro passo. Pegamos os dados brutos de cada ano, exatamente como eles vêm da fonte original, e fazemos apenas uma limpeza básica e padronização. É como tirar a poeira e organizar os papéis em pilhas iniciais, separadas por ano.
 Objetivo: Ter uma cópia fiel e limpa dos dados originais de cada ano, pronta para o próximo passo.
 
-b) Camada SILVER (Intermediate - "Estágio Intermediário")
+  b) Camada SILVER (Intermediate - "Estágio Intermediário")
 Onde os dados ficam: Em um esquema chamado SILVER.
 O que acontece aqui: Os dados da camada BRONZE (já consolidados de todos os anos) são combinados e enriquecidos. Por exemplo, podemos juntar informações de diferentes tabelas para criar uma visão mais completa. É como pegar as pilhas de papéis de todos os anos, juntar informações relacionadas e começar a preencher formulários para criar um registro único para cada evento.
 Objetivo: Criar um conjunto de dados mais rico e consolidado, que serve de base para a camada final.
 
-c) Camada GOLD (Consumption - "Estágio de Consumo")
+  c) Camada GOLD (Consumption - "Estágio de Consumo")
 Onde os dados ficam: Em um esquema chamado GOLD.
 O que acontece aqui: Esta é a camada final, onde os dados são transformados em tabelas prontas para análise. Criamos dois tipos principais de tabelas:
 Tabelas de Fatos: Contêm as "métricas" ou números que queremos analisar (ex: quantidade de leitos ocupados, número de óbitos).
 Tabelas de Dimensão: Fornecem o "contexto" para as métricas (ex: informações sobre a data, o hospital, a localização, o tipo de ocupação).
 Objetivo: Ser a camada que as pessoas de negócio (analistas, gestores) usam diretamente para criar os seus relatórios, gráficos e tomar decisões, sem precisar entender a complexidade dos dados brutos.
 
+```mermaid
 graph LR
 A[Dados Brutos Originais (2020, 2021, 2022)] --> B(Esquema BRONZE);
 B -- Limpeza e Padronização por Ano --> C(Consolidação de Anos);
 C -- Combinação e Enriquecimento --> D[Esquema SILVER];
 D -- Prontos para Análise --> E[Esquema GOLD];
 E -- Uso Final --> F[Relatórios, Dashboards e Decisões];
+```
 
-
-3. Scripts de Ingestão e Automação (Snowflake)
+## 3. Scripts de Ingestão e Automação (Snowflake)
 Antes que o dbt possa começar a transformar os dados, eles precisam ser carregados para dentro do Snowflake. Estes scripts SQL são executados diretamente no Snowflake para criar as tabelas RAW e carregar os dados dos arquivos CSV do seu stage.
 
 a) Criar Tabelas RAW (Estrutura)
 Estes comandos criam as tabelas que irão receber os dados brutos de cada ano, espelhando a estrutura dos arquivos CSV.
+```sql
 -- Tabela para os dados brutos de 2020
 CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2020 (
     UNNAMED_O NUMBER(38,0),
@@ -81,7 +83,8 @@ CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2020 (
     CREATED_AT TIMESTAMP_NTZ(9),
     UPDATED_AT TIMESTAMP_NTZ(9)
 );
-
+```
+```sql
 -- Tabela para os dados brutos de 2021
 CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2021 (
     UNNAMED_O NUMBER(38,0),
@@ -111,7 +114,8 @@ CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2021 (
     CREATED_AT TIMESTAMP_NTZ(9),
     UPDATED_AT TIMESTAMP_NTZ(9)
 );
-
+```
+```sql
 -- Tabela para os dados brutos de 2022
 CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2022 (
     UNNAMED_O NUMBER(38,0),
@@ -141,7 +145,8 @@ CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2022 (
     CREATED_AT TIMESTAMP_NTZ(9),
     UPDATED_AT TIMESTAMP_NTZ(9)
 );
-
+```
+```sql
 -- Tabela para os dados brutos de Municípios IBGE
 CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_MUNICIPIOS_IBGE (
     CODIGO_MUNICIPIO VARCHAR(16777216),
@@ -149,7 +154,8 @@ CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_MUNICIPIOS_IBGE (
     UF VARCHAR(16777216),
     CODIGO_UF VARCHAR(16777216)
 );
-
+```
+```sql
 -- Tabela para os dados brutos de Estabelecimentos CNES
 CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_ESTABELECIMENTOS_CNES (
     CO_CNES VARCHAR(16777216),
@@ -157,10 +163,12 @@ CREATE OR REPLACE TABLE COVID19.BRONZE.RAW_ESTABELECIMENTOS_CNES (
     TP_GESTAO VARCHAR(16777216),
     CO_CEP VARCHAR(16777216)
 );
-
+```
 
 b) Carregar Dados para Tabelas RAW (COPY INTO)
 Estes comandos carregam os dados dos arquivos CSV, que estão no stage no Snowflake, para as tabelas RAW criadas acima.
+
+```sql
 -- Carregar dados para a tabela RAW_LEITO_OCUPACAO_2020
 COPY INTO COVID19.BRONZE.RAW_LEITO_OCUPACAO_2020
 FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2020.csv
@@ -171,7 +179,8 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE
     ON_ERROR = 'CONTINUE'
 );
-
+```
+```sql
 -- Carregar dados para a tabela RAW_LEITO_OCUPACAO_2021
 COPY INTO COVID19.BRONZE.RAW_LEITO_OCUPACAO_2021
 FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2021.csv
@@ -182,7 +191,8 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE
     ON_ERROR = 'CONTINUE'
 );
-
+```
+```sql
 -- Carregar dados para a tabela RAW_LEITO_OCUPACAO_2022
 COPY INTO COVID19.BRONZE.RAW_LEITO_OCUPACAO_2022
 FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2022.csv
@@ -193,7 +203,8 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE
     ON_ERROR = 'CONTINUE'
 );
-
+```
+```sql
 -- Carregar dados para a tabela RAW_MUNICIPIOS_IBGE
 COPY INTO COVID19.BRONZE.RAW_MUNICIPIOS_IBGE
 FROM @COVID19.BRONZE.LEITO_OCUPACAO/municipios.csv
@@ -204,7 +215,8 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE
     ON_ERROR = 'CONTINUE'
 );
-
+```
+```sql
 -- Carregar dados para a tabela RAW_ESTABELECIMENTOS_CNES
 COPY INTO COVID19.BRONZE.RAW_ESTABELECIMENTOS_CNES
 FROM @COVID19.BRONZE.LEITO_OCUPACAO/cnes_estabelecimentos.csv
@@ -215,10 +227,12 @@ FILE_FORMAT = (
     EMPTY_FIELD_AS_NULL = TRUE
     ON_ERROR = 'CONTINUE'
 );
-
+```
 
 c) Conceder Privilégios (SELECT)
 Estes comandos concedem as permissões de leitura necessárias para as roles que o dbt utiliza no Snowflake, garantindo que o dbt possa acessar as tabelas RAW.
+
+```sql
 -- Conceder privilégios de seleção nas tabelas RAW de ocupação de leitos
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2020 TO ROLE PC_DBT_DB_PICKER_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2020 TO ROLE PC_DBT_ROLE;
@@ -226,16 +240,18 @@ GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2021 TO ROLE PC_DBT_DB_P
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2021 TO ROLE PC_DBT_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2022 TO ROLE PC_DBT_DB_PICKER_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_LEITO_OCUPACAO_2022 TO ROLE PC_DBT_ROLE;
-
+```
+```sql
 -- Conceder privilégios de seleção nas tabelas RAW de enriquecimento
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_MUNICIPIOS_IBGE TO ROLE PC_DBT_DB_PICKER_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_MUNICIPIOS_IBGE TO ROLE PC_DBT_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_ESTABELECIMENTOS_CNES TO ROLE PC_DBT_DB_PICKER_ROLE;
 GRANT SELECT ON TABLE COVID19.BRONZE.RAW_ESTABELECIMENTOS_CNES TO ROLE PC_DBT_ROLE;
+```
 
-
-4. Estrutura de Pastas do Projeto
+## 4. Estrutura de Pastas do Projeto
 O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simples e segue as convenções do dbt:
+```sql
 .
 ├── dbt_project.yml          # O "cérebro" do projeto: configurações gerais.
 ├── macros/                  # Pequenos programas que automatizam tarefas.
@@ -261,13 +277,13 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 └── tests/                   # Onde ficam os testes para garantir a qualidade dos dados.
     ├── test_no_future_dates.sql
     └── schema.yml           # Documentação e testes para os modelos.
+```
 
-
-5. Os Códigos: O Que Cada Parte Faz
+## 5. Os Códigos: O Que Cada Parte Faz
 
 a) dbt_project.yml: O "Manual de Instruções" do Projeto
 Este é o arquivo central que diz ao dbt como o projeto deve ser construído. Ele define o nome do projeto, onde encontrar os arquivos e como materializar (criar) as tabelas em cada camada.
-
+```sql
 name: 'COVID19'          
 version: '1.0.0'         
 config-version: 2       
@@ -297,11 +313,11 @@ models:
     facts:
       +materialized: incremental
       +schema: gold
-
+```
 
 b) macros/generate_schema_name.sql: A "Função Mágica dos Esquemas"
 Esta macro é um pequeno pedaço de código que o dbt usa para decidir em qual esquema (pasta) do banco de dados cada tabela ou view deve ser criada. Ela garante que os modelos vão para BRONZE, SILVER ou GOLD conforme configurado.
-
+```sql
 {% macro generate_schema_name(custom_schema_name, node) -%}
 
     {%- set default_schema = target.schema -%}
@@ -317,11 +333,11 @@ Esta macro é um pequeno pedaço de código que o dbt usa para decidir em qual e
     {%- endif -%}
 
 {%- endmacro %}
-
+```
 
 c) models/staging/sources.yml: O "Mapa das Fontes Originais"
 Este arquivo diz ao dbt onde encontrar os dados brutos no banco de dados. É como um mapa que aponta para as tabelas originais, agora incluindo os dados de 2020 e 2022.
-
+```sql
 version: 2
 sources:
   - name: bronze_source
@@ -333,11 +349,11 @@ sources:
       - name: RAW_ESTABELECIMENTOS_CNES
       - name: RAW_LEITO_OCUPACAO_2020
       - name: RAW_LEITO_OCUPACAO_2022
-
+```
 
 d) models/staging/stg_leito_ocupacao_2020.sql: "Primeira Limpeza 2020"
 Este modelo processa os dados brutos de 2020, selecionando, renomeando e limpando as colunas.
-
+```sql
 SELECT
     _id AS id_registro,
     TO_TIMESTAMP_NTZ(data_notificacao) AS data_notificacao,
@@ -367,11 +383,11 @@ SELECT
     2020 AS ano_dados
 FROM {{ source('bronze_source', 'RAW_LEITO_OCUPACAO_2020') }}
 WHERE excluido = FALSE
-
+```
 
 e) models/staging/stg_leito_ocupacao_2021.sql: "Primeira Limpeza 2021"
 Este modelo processa os dados brutos de 2021, selecionando, renomeando e limpando as colunas.
-
+```sql
 SELECT
     _id AS id_registro,
     TO_TIMESTAMP_NTZ(data_notificacao) AS data_notificacao,
@@ -401,11 +417,11 @@ SELECT
     2021 AS ano_dados
 FROM {{ source('bronze_source', 'RAW_LEITO_OCUPACAO_2021') }}
 WHERE excluido = FALSE
-
+```
 
 f) models/staging/stg_leito_ocupacao_2022.sql: "Primeira Limpeza 2022"
 Este modelo processa os dados brutos de 2022, selecionando, renomeando e limpando as colunas.
-
+```sql
 SELECT
     _id AS id_registro,
     TO_TIMESTAMP_NTZ(data_notificacao) AS data_notificacao,
@@ -435,11 +451,11 @@ SELECT
     2022 AS ano_dados
 FROM {{ source('bronze_source', 'RAW_LEITO_OCUPACAO_2022') }}
 WHERE excluido = FALSE
-
+```
 
 g) models/staging/stg_leito_ocupacao_consolidado.sql: "União de Todos os Anos"
 Este é o modelo-chave da camada BRONZE que une os dados de ocupação de leitos de todos os anos (2020, 2021 e 2022) em uma única tabela. Agora, todos os modelos seguintes (nas camadas Silver e Gold) só precisam se referir a este modelo consolidado.
-
+```sql
 -- Este modelo consolida os dados de ocupação de leitos de todos os anos.
 -- Ele usa UNION ALL para combinar os resultados dos modelos de staging de cada ano.
 SELECT * FROM {{ ref('stg_leito_ocupacao_2020') }}
@@ -447,11 +463,11 @@ UNION ALL
 SELECT * FROM {{ ref('stg_leito_ocupacao_2021') }}
 UNION ALL
 SELECT * FROM {{ ref('stg_leito_ocupacao_2022') }}
-
+```
 
 h) models/intermediate/int_leitos_ocupacao_unificado.sql: O "Enriquecedor de Dados"
 Este modelo da camada SILVER pega os dados consolidados da camada BRONZE e os combina com informações de outras dimensões (como a dimensão de localidade) para enriquecer os dados antes de criar a tabela de fatos. Ele foi atualizado para referenciar o modelo consolidado.
-
+```sql
 -- Este modelo serve como ponte, enriquecendo os dados de staging com
 -- as chaves das dimensões antes de carregar a tabela de fatos.
 -- Pega todos os dados do modelo de staging CONSOLIDADO (agora com todos os anos).
@@ -473,11 +489,11 @@ FROM staging_data stg
 LEFT JOIN dim_localidade loc ON
     UPPER(COALESCE(stg.municipio_notificacao, stg.municipio, 'Desconhecido')) = UPPER(loc.municipio)
     AND UPPER(COALESCE(stg.estado_notificacao, stg.estado, 'Desconhecido')) = UPPER(loc.estado)
-
+```
 
 i) Modelos de Dimensão
 Estes modelos criam as tabelas de dimensão na camada GOLD. Eles foram atualizados para referenciar o modelo consolidado (stg_leito_ocupacao_consolidado) quando necessário.
-
+```sql
 dim_cnes.sql:
 
 -- Este modelo cria a dimensão de estabelecimentos de saúde (CNES).
@@ -509,7 +525,8 @@ FROM
     cnes_nos_dados c
 LEFT JOIN
     estabelecimentos_cnes cnes ON c.id_cnes = cnes.id_cnes
-
+```
+```sql
 dim_data.sql:
 
 -- Este modelo cria a dimensão de tempo.
@@ -529,7 +546,8 @@ SELECT
     EXTRACT(DAYOFWEEK FROM data) AS dia_da_semana
 FROM datas_distintas
 ORDER BY data
-
+```
+```sql
 dim_localidade.sql:
 
 -- Este modelo cria a dimensão geográfica (localidade).
@@ -549,7 +567,8 @@ SELECT
     municipio
 FROM localidades_distintas
 ORDER BY estado, municipio
-
+```
+```sql
 dim_ocupacao_tipo.sql:
 
 -- Este modelo cria a dimensão de tipos de ocupação de leitos.
@@ -565,7 +584,8 @@ SELECT * FROM (
     (7, 'Hospitalar', 'Clínico'),
     (8, 'Hospitalar', 'UTI')
 ) AS t(id_ocupacao_tipo, tipo_ocupacao, tipo_leito)
-
+```
+```sql
 dim_tempo.sql:
 
 -- Este modelo cria a dimensão de tempo detalhada.
@@ -591,7 +611,8 @@ SELECT
     FALSE AS feriado
 FROM date_spine
 ORDER BY data
-
+```
+```sql
 dim_unidade_saude.sql:
 
 -- Este modelo cria a dimensão de unidades de saúde.
@@ -609,12 +630,12 @@ SELECT
     cnes AS nome_unidade
 FROM unidades_distintas
 ORDER BY cnes
-
+```
 
 
 j) models/facts/fact_ocupacao_leitos.sql: O "Coração do Sistema"
 Este é o modelo da tabela de fatos da camada GOLD, que armazena as métricas de ocupação de leitos. Ele foi atualizado para usar o modelo intermediário, que já contém os dados consolidados de todos os anos.
-
+```sql
 -- Este modelo cria a tabela de fatos de ocupação de leitos.
 -- Pega os dados do modelo intermediário (já enriquecido e consolidado).
 WITH intermediate_data AS (
@@ -657,11 +678,11 @@ JOIN {{ ref('dim_data') }} t ON DATE(u.data_notificacao) = t.data
 JOIN {{ ref('dim_ocupacao_tipo') }} ot ON u.tipo_ocupacao = ot.tipo_ocupacao AND u.tipo_leito = ot.tipo_leito
 LEFT JOIN saidas_data s ON u.id_registro = s.id_registro
 WHERE u.ocupacao > 0
-
+```
 
 k) schema.yml: A "Documentação e Qualidade dos Dados"
 Este arquivo é fundamental para documentar os modelos e fontes, e para definir testes de qualidade dos dados. Ele garante que os dados estão sempre corretos e completos.
-
+```sql
 version: 2
 sources:
   - name: bronze_source
@@ -698,18 +719,18 @@ models:
         tests:
           - unique
           - not_null
-
+```
 
 l) tests/test_no_future_dates.sql: O "Guardião das Datas"
 Este é um exemplo de um teste de dados. Ele verifica se não há datas futuras na tabela de fatos, garantindo a integridade dos dados. Se encontrar alguma data futura, o teste falha, alertando para um problema.
-
+```sql
 SELECT *
 FROM COVID19.GOLD.fact_ocupacao_leitos f
 JOIN COVID19.GOLD.dim_tempo t ON f.id_tempo = t.id_tempo
 WHERE t.data > CURRENT_DATE()
+```
 
-
-6. Orquestração e Automação: O Projeto em Produção
+## 6. Orquestração e Automação: O Projeto em Produção
 Para garantir que os dados estejam sempre atualizados e que as transformações rodem de forma consistente, foi implementada a orquestração do projeto utilizando tanto os Jobs do dbt Cloud quanto as tasks nativas do Snowflake.
 
 a) Orquestração com Jobs do dbt Cloud
@@ -732,6 +753,7 @@ Monitoramento: Notificações são configuradas para alertar a equipe em caso de
 c) Automação de Ingestão Direta no Snowflake: Tasks e File Format
 Para a ingestão dos dados brutos, foram criadas tasks diretamente no Snowflake. Essas tasks são responsáveis por carregar os arquivos CSV do stage para as tabelas RAW de cada ano. O uso de MERGE INTO garante que novos registros sejam inseridos sem duplicar dados já existentes, o que é crucial para a qualidade e consistência dos dados.
 
+```sql
 File Format (COVID_CSV_FORMAT)
 Este comando cria um formato de arquivo que ajuda o Snowflake a interpretar corretamente os arquivos CSV.
 -- criar file format
@@ -740,10 +762,11 @@ TYPE = CSV
 FIELD_DELIMITER = ',',
 SKIP_HEADER = 1,
 EMPTY_FIELD_AS_NULL = TRUE;
-
+```
 
 Tasks para Ingestão e Mesclagem (MERGE)
 Estes comandos criam tasks que automatizam o processo de mesclar novos dados nos arquivos brutos existentes. Esta abordagem é útil para atualizar os dados periodicamente, garantindo que os novos registros sejam adicionados e que os existentes não sejam duplicados.
+```sql
 -- Task para mesclar dados na tabela de 2020
 create or replace task COVID19.BRONZE.COVID_2020_TASK_MERGE_INGEST
 	warehouse=TRANSFORMING
@@ -803,7 +826,8 @@ WHEN NOT MATCHED THEN
     source.ORIGEM, source.P_USUARIO, source.ESTADO_NOTIFICACAO, source.MUNICIPIO_NOTIFICACAO,
     source.ESTADO, source.MUNICIPIO, source.EXCLUIDO, source.VALIDADO, source.CREATED_AT, source.UPDATED_AT
   );
-
+```
+```sql
 -- Task para mesclar dados na tabela de 2021
 create or replace task COVID19.BRONZE.COVID_2021_TASK_MERGE_INGEST
 	warehouse=TRANSFORMING
@@ -863,7 +887,8 @@ WHEN NOT MATCHED THEN
     source.ORIGEM, source.P_USUARIO, source.ESTADO_NOTIFICACAO, source.MUNICIPIO_NOTIFICACAO,
     source.ESTADO, source.MUNICIPIO, source.EXCLUIDO, source.VALIDADO, source.CREATED_AT, source.UPDATED_AT
   );
-
+```
+```sql
 -- Task para mesclar dados na tabela de 2022
 create or replace task COVID19.BRONZE.COVID_2022_TASK_MERGE_INGEST
 	warehouse=TRANSFORMING
@@ -923,7 +948,8 @@ WHEN NOT MATCHED THEN
     source.ORIGEM, source.P_USUARIO, source.ESTADO_NOTIFICACAO, source.MUNICIPIO_NOTIFICACAO,
     source.ESTADO, source.MUNICIPIO, source.EXCLUIDO, source.VALIDADO, source.CREATED_AT, source.UPDATED_AT
   );
-
+```
+```sql
 -- Task para mesclar dados na tabela de 2022
 create or replace task COVID19.BRONZE.COVID_2022_TASK_MERGE_INGEST
 	warehouse=TRANSFORMING
@@ -983,8 +1009,8 @@ WHEN NOT MATCHED THEN
     source.ORIGEM, source.P_USUARIO, source.ESTADO_NOTIFICACAO, source.MUNICIPIO_NOTIFICACAO,
     source.ESTADO, source.MUNICIPIO, source.EXCLUIDO, source.VALIDADO, source.CREATED_AT, source.UPDATED_AT
   );
-
-
+```
+```sql
 Tasks para Ingestão (COPY INTO)
 -- Task para automação da ingestão de 2020
 create or replace task COVID19.BRONZE.COVID_2020_TASK_INGEST
@@ -994,7 +1020,8 @@ create or replace task COVID19.BRONZE.COVID_2020_TASK_INGEST
   FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2020.csv
   FILE_FORMAT = covid_csv_format
   ON_ERROR = 'CONTINUE';
-
+```
+```sql
 -- Task para automação da ingestão de 2021
 create or replace task COVID19.BRONZE.COVID_2021_TASK_INGEST
 	warehouse=TRANSFORMING
@@ -1003,7 +1030,8 @@ create or replace task COVID19.BRONZE.COVID_2021_TASK_INGEST
   FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2021.csv
   FILE_FORMAT = covid_csv_format
   ON_ERROR = 'CONTINUE';
-
+```
+```sql
 -- Task para automação da ingestão de 2022
 create or replace task COVID19.BRONZE.COVID_2022_TASK_INGEST
 	warehouse=TRANSFORMING
@@ -1012,9 +1040,9 @@ create or replace task COVID19.BRONZE.COVID_2022_TASK_INGEST
   FROM @COVID19.BRONZE.LEITO_OCUPACAO/esus-vepi.LeitoOcupacao_2022.csv
   FILE_FORMAT = covid_csv_format
   ON_ERROR = 'CONTINUE';
+```
 
-
-7. Inovação e Diferenciação: O Que Torna Este Projeto Especial
+## 7. Inovação e Diferenciação: O Que Torna Este Projeto Especial
 Este projeto incorpora diversas inovações e boas práticas que o tornam uma solução robusta e moderna para análise de dados de saúde pública:
 
 a) Modelagem Dimensional Orientada a Insights
@@ -1037,7 +1065,7 @@ e) Flexibilidade para Análise Temporal e Geográfica
 A criação de dimensões robustas como DIM_TEMPO (com granularidade de dia, mês, ano, semana, trimestre) e DIM_LOCALIDADE (estado e município) permite análises multidimensionais flexíveis. Isso é fundamental para entender a dinâmica da ocupação de leitos em diferentes períodos e regiões, apoiando decisões estratégicas em saúde pública.
 Essas inovações, combinadas com a escolha de tecnologias de ponta como Snowflake e dbt, resultam em uma solução de engenharia de dados que não é apenas funcional, mas também eficiente, confiável e preparada para o futuro.
 
-8. Como Executar o Projeto
+## 8. Como Executar o Projeto
 Para construir todo o projeto e criar as tabelas e views no seu banco de dados, só precisa de um comando no terminal do dbt Cloud:
 dbt build --full-refresh
 
@@ -1046,10 +1074,11 @@ Este comando:
 dbt build: Executa todos os modelos e testes do seu projeto.
 --full-refresh: Garante que todas as tabelas e views sejam recriadas do zero, o que é útil após alterações na estrutura ou para garantir que não há dados antigos.
 
-9. Exemplos de Consultas e Insights
+## 9. Exemplos de Consultas e Insights
 Para demonstrar a utilidade das tabelas da camada GOLD, aqui estão alguns exemplos de consultas SQL que podem ser usadas para obter insights relevantes sobre a saúde pública.
 
 Exemplo 1: Total de leitos de UTI ocupados por COVID em São Paulo durante o ano de 2021.
+```sql
 SELECT
     dl.estado,
     dl.municipio,
@@ -1073,11 +1102,12 @@ GROUP BY
     dt.ano
 ORDER BY
     total_leitos_uti_covid DESC;
-
+```
 
 Insight: Esta consulta mostra a carga de leitos de UTI específicos para COVID-19 por município em São Paulo, permitindo que as autoridades de saúde identifiquem as áreas com maior demanda e aloquem recursos de forma mais eficiente.
 
 Exemplo 2: Variação mensal de óbitos por COVID confirmados em 2022.
+```sql
 WITH saidas_mensais AS (
     SELECT
         dt.ano,
@@ -1102,11 +1132,12 @@ FROM saidas_mensais
 ORDER BY
     ano,
     mes;
-
+```
 
 Insight: Esta análise mostra a variação percentual mensal de óbitos confirmados por COVID em 2022. É um indicador-chave para monitorar o impacto da pandemia e a eficácia das medidas de saúde pública ao longo do tempo.
 
 Exemplo 3: Top 5 hospitais com maior taxa de altas confirmadas em 2021.
+```sql
 WITH hospital_metrics AS (
     SELECT
         dc.nm_estabelecimento,
@@ -1135,10 +1166,10 @@ WHERE
 ORDER BY
     taxa_alta_percentual DESC
 LIMIT 5;
-
+```
 
 Insight: Esta consulta identifica os cinco hospitais com a maior taxa de altas confirmadas em 2021. Essa informação é vital para entender a eficiência e o sucesso de tratamentos em diferentes unidades de saúde, permitindo a identificação de melhores práticas.
 
-9. Link para o dbt Docs gerado
+## 9. Link para o dbt Docs gerado
 https://adsmbr.github.io/DESAFIO-FINAL-TRIGGO-AI/#!/overview
 
