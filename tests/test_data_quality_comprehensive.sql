@@ -1,9 +1,12 @@
--- Test for data integrity and business logic validation
--- This test ensures data quality without breaking existing functionality
--- Returns empty result set if all tests pass
+-- Comprehensive data quality validation
+-- Only returns rows if there are actual data quality problems
 
-WITH data_quality_checks AS (
-    -- Test 1: Verify no negative bed occupancy
+SELECT 
+    test_type,
+    failed_records,
+    'Data quality issue detected' AS description
+FROM (
+    -- Test 1: Check for negative bed occupancy (impossible values)
     SELECT 
         'negative_occupancy' AS test_type,
         COUNT(*) AS failed_records
@@ -12,7 +15,7 @@ WITH data_quality_checks AS (
 
     UNION ALL
 
-    -- Test 2: Verify reasonable upper bounds for bed occupancy  
+    -- Test 2: Check for extremely high values (likely data errors)
     SELECT 
         'unrealistic_high_occupancy' AS test_type,
         COUNT(*) AS failed_records
@@ -21,17 +24,16 @@ WITH data_quality_checks AS (
 
     UNION ALL
 
-    -- Test 3: Verify data completeness for critical fields
+    -- Test 3: Check for missing critical dimension keys
     SELECT 
-        'missing_critical_data' AS test_type,
+        'missing_dimension_keys' AS test_type,
         COUNT(*) AS failed_records
     FROM {{ ref('fact_ocupacao_leitos') }}
     WHERE id_tempo IS NULL 
        OR id_localidade IS NULL 
        OR id_ocupacao_tipo IS NULL
 )
+WHERE failed_records > 0  -- Only show actual problems
 
--- Only return rows if there are failures (empty result = all tests pass)
-SELECT *
-FROM data_quality_checks
-WHERE failed_records > 0
+-- Empty result = all data quality checks pass
+-- Any rows returned indicate specific data quality issues
