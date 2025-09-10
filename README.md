@@ -1167,16 +1167,21 @@ Este modelo fornece:
 # Verificar qualidade geral dos dados
 dbt run --select data_quality_summary
 
-# Executar apenas testes críticos
-dbt test --select test_critical_data_issues
+# Executar monitoramento de integridade detalhado
+dbt run --select data_integrity_monitoring
 
-# Executar todos os testes de qualidade
-dbt test --select test_critical_data_issues test_data_quality_comprehensive test_no_future_dates
+# Executar testes por nível de severidade
+dbt test --exclude test_silver_layer_integrity test_gold_layer_critical_integrity  # Apenas testes tolerantes
+dbt test --select test_silver_layer_integrity  # Testes rigorosos da camada Silver
+dbt test --select test_gold_layer_critical_integrity  # Testes críticos da camada Gold
+
+# Executar todos os testes de qualidade (com tolerância em staging)
+dbt test --select test_consolidado_data_integrity test_unique_id_across_years test_critical_data_issues test_data_quality_comprehensive test_no_future_dates
 
 # Compilar análise de investigação
 dbt compile --select data_quality_investigation
 
-# Pipeline completo com validação
+# Pipeline completo com validação em camadas
 dbt build --full-refresh
 ```
 
@@ -1219,15 +1224,30 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 
 #### 🔍 Novos Testes de Qualidade Implementados
 
-**1. Teste de Integridade de Dados Consolidados**
-- **Arquivo:** `tests/test_consolidado_data_integrity.sql`
-- **Função:** Valida se todos os registros têm campos essenciais preenchidos
-- **Verifica:** id_registro, data_notificacao, cnes, ano_dados
+**Estratégia de Testes em Camadas:**
+- **Bronze (Staging):** Testes tolerantes que permitem alguns problemas menores
+- **Silver (Intermediate):** Testes rigorosos para dados limpos
+- **Gold (Facts/Dimensions):** Tolerância zero para problemas críticos
 
-**2. Teste de Unicidade de IDs**
-- **Arquivo:** `tests/test_unique_id_across_years.sql`
-- **Função:** Verifica se há IDs duplicados entre os diferentes anos
-- **Importância:** Garante integridade referencial entre 2020, 2021 e 2022
+**1. Teste de Integridade de Dados Consolidados (Tolerante)**
+- **Arquivo:** `tests/test_consolidado_data_integrity.sql`
+- **Função:** Permite problemas menores na camada de staging (<5% dos registros)
+- **Verifica:** id_registro, ano_dados (campos críticos apenas)
+
+**2. Monitoramento de Integridade (Modelo)**
+- **Arquivo:** `models/monitoring/data_integrity_monitoring.sql`
+- **Função:** Fornece visibilidade detalhada sobre problemas sem bloquear pipeline
+- **Execução:** `dbt run --select data_integrity_monitoring`
+
+**3. Teste de Integridade Silver (Rigoroso)**
+- **Arquivo:** `tests/test_silver_layer_integrity.sql`
+- **Função:** Tolerância zero para problemas na camada intermediate
+- **Verifica:** Todos os campos essenciais devem estar presentes
+
+**4. Teste de Integridade Gold (Crítico)**
+- **Arquivo:** `tests/test_gold_layer_critical_integrity.sql`
+- **Função:** Garante integridade absoluta na camada de consumo
+- **Verifica:** Chaves, métricas e consistência de dados
 
 #### 📈 Sistema de Monitoramento Expandido
 
@@ -1254,8 +1274,16 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 ### 🎯 Comandos de Execução Atualizados
 
 ```bash
-# Executar testes de integridade específicos
-dbt test --select test_consolidado_data_integrity test_unique_id_across_years
+# Executar monitoramento de integridade (não bloqueante)
+dbt run --select data_integrity_monitoring
+
+# Executar testes por camada
+dbt test --select test_consolidado_data_integrity  # Bronze (tolerante)
+dbt test --select test_silver_layer_integrity      # Silver (rigoroso) 
+dbt test --select test_gold_layer_critical_integrity # Gold (crítico)
+
+# Executar teste de unicidade de IDs
+dbt test --select test_unique_id_across_years
 
 # Validar modelos de dimensão atualizados
 dbt run --select models/dimensions
@@ -1265,6 +1293,9 @@ dbt compile --select analyses/data_quality_investigation
 
 # Pipeline completo com novas validações
 dbt build --full-refresh
+
+# Executar apenas testes não críticos (warn level)
+dbt test --exclude test_silver_layer_integrity test_gold_layer_critical_integrity
 ```
 
 ## 8. Inovação e Diferenciação: O Que Torna Este Projeto Especial
