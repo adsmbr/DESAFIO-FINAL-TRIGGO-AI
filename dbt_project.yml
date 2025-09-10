@@ -56,3 +56,11 @@ models:
       +meta:
         layer: "gold"
         data_classification: "sensitive"
+
+    # Monitoring tables - Data quality and operational insights
+    monitoring:
+      +materialized: table
+      +schema: monitoring
+      +meta:
+        layer: "monitoring"
+        data_classification: "internal"
