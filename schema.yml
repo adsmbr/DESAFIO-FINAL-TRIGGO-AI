@@ -15,8 +15,38 @@ sources:
         description: "Dados de municípios brasileiros - IBGE"
       - name: RAW_ESTABELECIMENTOS_CNES
         description: "Dados de estabelecimentos de saúde - CNES"
+      - name: RAW_LEITO_OCUPACAO_2020
+        description: "Dados brutos de ocupação de leitos - 2020"
+      - name: RAW_LEITO_OCUPACAO_2022
+        description: "Dados brutos de ocupação de leitos - 2022"
 
 models:
+  - name: stg_leito_ocupacao_consolidado
+    description: "Modelo de staging que consolida dados de ocupação de leitos de todos os anos (2020-2022)"
+    meta:
+      layer: "bronze"
+      data_classification: "sensitive"
+    columns:
+      - name: id_registro
+        description: "Identificador único do registro"
+        tests:
+          - unique
+          - not_null
+      - name: data_notificacao
+        description: "Data de notificação do registro"
+        tests:
+          - not_null
+      - name: cnes
+        description: "Código do estabelecimento de saúde (CNES)"
+        tests:
+          - not_null
+      - name: ano_dados
+        description: "Ano de origem dos dados"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [2020, 2021, 2022]
+
   - name: dim_tempo
     description: "Dimensão temporal com informações detalhadas sobre datas"
     meta:
@@ -38,6 +68,16 @@ models:
           - not_null
           - accepted_values:
               values: [2020, 2021, 2022]
+      - name: trimestre
+        description: "Trimestre do ano (1-4)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: semana_do_ano
+        description: "Semana do ano (1-53)"
+        tests:
+          - not_null
 
   - name: dim_localidade
     description: "Dimensão geográfica com estados e municípios"
@@ -56,6 +96,10 @@ models:
           - not_null
       - name: municipio
         description: "Nome do município"
+        tests:
+          - not_null
+      - name: localidade_completa
+        description: "Localidade formatada como 'Município - Estado'"
         tests:
           - not_null
 

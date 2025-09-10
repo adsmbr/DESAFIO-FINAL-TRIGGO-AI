@@ -64,6 +64,38 @@ WITH data_quality_results AS (
         COUNT(*) AS affected_records,
         'Total records in fact table' AS description
     FROM {{ ref('fact_ocupacao_leitos') }}
+
+    UNION ALL
+
+    -- Check for data freshness (records older than expected)
+    SELECT 
+        'outdated_records' AS issue_type,
+        COUNT(*) AS affected_records,
+        'Records with update timestamps older than 30 days' AS description
+    FROM {{ ref('fact_ocupacao_leitos') }}
+    WHERE updated_at < CURRENT_DATE() - INTERVAL '30 days'
+
+    UNION ALL
+
+    -- Check for orphaned CNES codes
+    SELECT 
+        'orphaned_cnes' AS issue_type,
+        COUNT(DISTINCT id_cnes) AS affected_records,
+        'CNES codes in facts but not in dimension' AS description
+    FROM {{ ref('fact_ocupacao_leitos') }} f
+    LEFT JOIN {{ ref('dim_cnes') }} c ON f.id_cnes = c.id_cnes
+    WHERE c.id_cnes IS NULL
+
+    UNION ALL
+
+    -- Check for missing exit data consistency
+    SELECT 
+        'inconsistent_exit_data' AS issue_type,
+        COUNT(*) AS affected_records,
+        'Records with deaths but no total exits reported' AS description
+    FROM {{ ref('fact_ocupacao_leitos') }}
+    WHERE saida_confirmada_obitos > 0 
+      AND (saida_confirmada_altas IS NULL OR saida_confirmada_altas = 0)
 )
 
 SELECT 
