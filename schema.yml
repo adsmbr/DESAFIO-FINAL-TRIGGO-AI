@@ -76,6 +76,3 @@ models:
         description: "Número de leitos ocupados"
         tests:
           - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 10000
