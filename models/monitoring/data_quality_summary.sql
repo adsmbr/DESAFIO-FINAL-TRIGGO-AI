@@ -80,7 +80,7 @@ WITH data_quality_results AS (
     -- Check for orphaned CNES codes
     SELECT 
         'orphaned_cnes' AS issue_type,
-        COUNT(DISTINCT id_cnes) AS affected_records,
+        COUNT(DISTINCT f.id_cnes) AS affected_records,
         'CNES codes in facts but not in dimension' AS description
     FROM {{ ref('fact_ocupacao_leitos') }} f
     LEFT JOIN {{ ref('dim_cnes') }} c ON f.id_cnes = c.id_cnes
