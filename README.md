@@ -254,6 +254,8 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 ```sql
 .
 ├── dbt_project.yml          # O "cérebro" do projeto: configurações gerais.
+├── SECURITY.md              # NOVO: Diretrizes de segurança e melhores práticas.
+├── VALIDATION.md             # NOVO: Guia de validação de deployment.
 ├── macros/                  # Pequenos programas que automatizam tarefas.
 │   └── generate_schema_name.sql # Macro para definir nomes de esquemas.
 ├── models/                  # Onde ficam os arquivos SQL que transformam os dados.
@@ -272,11 +274,17 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 │   │   ├── dim_ocupacao_tipo.sql
 │   │   ├── dim_tempo.sql
 │   │   └── dim_unidade_saude.sql
-│   └── facts/               # Modelos de fatos da camada GOLD.
-│       └── fact_ocupacao_leitos.sql
-└── tests/                   # Onde ficam os testes para garantir a qualidade dos dados.
-    ├── test_no_future_dates.sql
-    └── schema.yml           # Documentação e testes para os modelos.
+│   ├── facts/               # Modelos de fatos da camada GOLD.
+│   │   └── fact_ocupacao_leitos.sql
+│   └── monitoring/          # NOVO: Modelos de monitoramento de qualidade.
+│       └── data_quality_summary.sql
+├── tests/                   # Onde ficam os testes para garantir a qualidade dos dados.
+│   ├── test_no_future_dates.sql
+│   ├── test_critical_data_issues.sql    # NOVO: Testes críticos de qualidade.
+│   └── test_data_quality_comprehensive.sql # NOVO: Testes abrangentes.
+├── analyses/                # NOVO: Consultas de investigação e análise.
+│   └── data_quality_investigation.sql
+└── schema.yml               # Documentação e testes para os modelos.
 ```
 
 ## 5. Os Códigos: O Que Cada Parte Faz
@@ -1042,7 +1050,135 @@ create or replace task COVID19.BRONZE.COVID_2022_TASK_INGEST
   ON_ERROR = 'CONTINUE';
 ```
 
-## 7. Inovação e Diferenciação: O Que Torna Este Projeto Especial
+## 7. Segurança e Qualidade de Dados
+
+Para garantir a segurança e integridade dos dados em ambiente de produção, o projeto implementa várias camadas de proteção e monitoramento.
+
+### 7.1 Funcionalidades de Segurança Implementadas
+
+#### a) Classificação de Dados e Metadados
+Todos os modelos agora incluem classificação de sensibilidade dos dados:
+- **Public**: Dimensões de tempo e localização
+- **Internal**: Dados agregados sem identificadores pessoais  
+- **Sensitive**: Dados brutos de saúde e métricas detalhadas
+
+#### b) Trilhas de Auditoria
+O projeto foi configurado para incluir rastreamento automático de:
+- Identificação de execução (`run_id`)
+- Timestamp de processamento
+- Usuário responsável pela execução
+- Versão do dbt utilizada
+
+#### c) Documentação de Segurança
+Foi criado o arquivo `SECURITY.md` com:
+- Diretrizes de configuração segura para Snowflake
+- Boas práticas para gerenciamento de credenciais
+- Políticas de acesso e controle de roles
+- Procedimentos de resposta a incidentes
+
+### 7.2 Sistema de Monitoramento de Qualidade de Dados
+
+#### a) Testes Automáticos de Qualidade
+O projeto inclui testes abrangentes que verificam:
+
+**Testes Críticos:**
+- Valores nulos em campos obrigatórios
+- Valores negativos impossíveis (ocupação de leitos)
+- Referências de dimensão ausentes
+- Datas futuras inválidas
+
+**Testes Abrangentes:**
+- Valores extremos suspeitos (>10.000 leitos)
+- Integridade referencial entre tabelas
+- Completude de dados por período
+
+#### b) Modelo de Monitoramento em Tempo Real
+Criamos um modelo dedicado para monitoramento contínuo:
+
+```bash
+# Executar relatório de qualidade de dados
+dbt run --select data_quality_summary
+```
+
+Este modelo fornece:
+- ✅ Status visual dos problemas (OK, Atenção Menor, Atenção Requerida)
+- 📊 Contagem de registros afetados por tipo de problema
+- 📈 Estatísticas gerais da tabela de fatos
+
+#### c) Estrutura de Pastas Atualizada
+```
+.
+├── dbt_project.yml          # Configurações de segurança e auditoria
+├── SECURITY.md              # NOVO: Diretrizes de segurança
+├── VALIDATION.md             # NOVO: Guia de validação de deployment
+├── macros/                   
+│   └── generate_schema_name.sql
+├── models/                   
+│   ├── staging/             # Camada BRONZE
+│   ├── intermediate/        # Camada SILVER  
+│   ├── dimensions/          # Dimensões GOLD
+│   ├── facts/               # Fatos GOLD
+│   └── monitoring/          # NOVO: Modelos de monitoramento
+│       └── data_quality_summary.sql
+├── tests/                   # Testes de qualidade melhorados
+│   ├── test_no_future_dates.sql
+│   ├── test_critical_data_issues.sql    # NOVO
+│   └── test_data_quality_comprehensive.sql # NOVO
+├── analyses/                # NOVO: Consultas de investigação
+│   └── data_quality_investigation.sql
+└── schema.yml               # Documentação com metadados de segurança
+```
+
+### 7.3 Processo de Validação e Deploy
+
+#### a) Antes do Deploy em Produção
+1. **Validação de Sintaxe**: `dbt parse`
+2. **Compilação**: `dbt compile`  
+3. **Execução de Testes**: `dbt test`
+4. **Verificação de Qualidade**: `dbt run --select data_quality_summary`
+
+#### b) Monitoramento Contínuo
+- Testes automáticos não bloqueiam o pipeline
+- Alertas informativos em caso de problemas de qualidade
+- Relatórios regulares de status dos dados
+
+#### c) Rollback e Recuperação
+- Branch principal (`main`) sempre mantém versão estável
+- Mudanças testadas em branch secundário (`adsmbr-patch-1`)
+- Possibilidade de rollback imediato se necessário
+
+### 7.4 Compliance e Conformidade
+
+#### a) LGPD/GDPR
+- Identificação e proteção de dados pessoais (campo `p_usuario`)
+- Políticas de retenção de dados
+- Documentação de atividades de processamento
+
+#### b) Dados de Saúde
+- Controles de acesso baseados em roles
+- Logs de auditoria para acesso a dados sensíveis
+- Procedimentos de resposta a incidentes
+
+### 7.5 Comandos de Monitoramento
+
+```bash
+# Verificar qualidade geral dos dados
+dbt run --select data_quality_summary
+
+# Executar apenas testes críticos
+dbt test --select test_critical_data_issues
+
+# Executar todos os testes de qualidade
+dbt test --select test_critical_data_issues test_data_quality_comprehensive test_no_future_dates
+
+# Compilar análise de investigação
+dbt compile --select data_quality_investigation
+
+# Pipeline completo com validação
+dbt build --full-refresh
+```
+
+## 8. Inovação e Diferenciação: O Que Torna Este Projeto Especial
 Este projeto incorpora diversas inovações e boas práticas que o tornam uma solução robusta e moderna para análise de dados de saúde pública:
 
 a) Modelagem Dimensional Orientada a Insights
@@ -1065,7 +1201,7 @@ e) Flexibilidade para Análise Temporal e Geográfica
 A criação de dimensões robustas como DIM_TEMPO (com granularidade de dia, mês, ano, semana, trimestre) e DIM_LOCALIDADE (estado e município) permite análises multidimensionais flexíveis. Isso é fundamental para entender a dinâmica da ocupação de leitos em diferentes períodos e regiões, apoiando decisões estratégicas em saúde pública.
 Essas inovações, combinadas com a escolha de tecnologias de ponta como Snowflake e dbt, resultam em uma solução de engenharia de dados que não é apenas funcional, mas também eficiente, confiável e preparada para o futuro.
 
-## 8. Como Executar o Projeto
+## 9. Como Executar o Projeto
 Para construir todo o projeto e criar as tabelas e views no seu banco de dados, só precisa de um comando no terminal do dbt Cloud:
 dbt build --full-refresh
 
@@ -1074,7 +1210,7 @@ Este comando:
 dbt build: Executa todos os modelos e testes do seu projeto.
 --full-refresh: Garante que todas as tabelas e views sejam recriadas do zero, o que é útil após alterações na estrutura ou para garantir que não há dados antigos.
 
-## 9. Exemplos de Consultas e Insights
+## 10. Exemplos de Consultas e Insights
 Para demonstrar a utilidade das tabelas da camada GOLD, aqui estão alguns exemplos de consultas SQL que podem ser usadas para obter insights relevantes sobre a saúde pública.
 
 Exemplo 1: Total de leitos de UTI ocupados por COVID em São Paulo durante o ano de 2021.
@@ -1170,6 +1306,6 @@ LIMIT 5;
 
 Insight: Esta consulta identifica os cinco hospitais com a maior taxa de altas confirmadas em 2021. Essa informação é vital para entender a eficiência e o sucesso de tratamentos em diferentes unidades de saúde, permitindo a identificação de melhores práticas.
 
-## 9. Link para o dbt Docs gerado
+## 11. Link para o dbt Docs gerado
 https://adsmbr.github.io/DESAFIO-FINAL-TRIGGO-AI/#!/overview
 
