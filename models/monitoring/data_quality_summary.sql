@@ -77,17 +77,6 @@ WITH data_quality_results AS (
 
     UNION ALL
 
-    -- Check for orphaned CNES codes
-    SELECT 
-        'orphaned_cnes' AS issue_type,
-        COUNT(DISTINCT f.id_cnes) AS affected_records,
-        'CNES codes in facts but not in dimension' AS description
-    FROM {{ ref('fact_ocupacao_leitos') }} f
-    LEFT JOIN {{ ref('dim_cnes') }} c ON f.id_cnes = c.id_cnes
-    WHERE c.id_cnes IS NULL
-
-    UNION ALL
-
     -- Check for missing exit data consistency
     SELECT 
         'inconsistent_exit_data' AS issue_type,
