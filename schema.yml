@@ -4,35 +4,78 @@ sources:
   - name: bronze_source
     database: COVID19
     schema: BRONZE
+    description: "Fontes de dados brutos do sistema COVID19"
+    meta:
+      data_classification: "sensitive"
+      source_system: "DataSUS"
     tables:
       - name: RAW_LEITO_OCUPACAO_2021
+        description: "Dados brutos de ocupação de leitos - 2021"
       - name: RAW_MUNICIPIOS_IBGE
+        description: "Dados de municípios brasileiros - IBGE"
       - name: RAW_ESTABELECIMENTOS_CNES
+        description: "Dados de estabelecimentos de saúde - CNES"
 
 models:
   - name: dim_tempo
     description: "Dimensão temporal com informações detalhadas sobre datas"
+    meta:
+      layer: "gold"
+      data_classification: "public"
     columns:
       - name: id_tempo
         description: "Chave primária da dimensão tempo"
         tests:
           - unique
           - not_null
+      - name: data
+        description: "Data no formato DATE"
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano extraído da data"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [2020, 2021, 2022]
 
   - name: dim_localidade
     description: "Dimensão geográfica com estados e municípios"
+    meta:
+      layer: "gold"
+      data_classification: "public"
     columns:
       - name: id_localidade
         description: "Chave primária da dimensão localidade"
         tests:
           - unique
           - not_null
+      - name: estado
+        description: "Nome do estado"
+        tests:
+          - not_null
+      - name: municipio
+        description: "Nome do município"
+        tests:
+          - not_null
 
   - name: fact_ocupacao_leitos
     description: "Tabela de fatos com métricas de ocupação de leitos"
+    meta:
+      layer: "gold"
+      data_classification: "sensitive"
+      contains_pii: false
+      retention_period: "7_years"
     columns:
       - name: id_fato
         description: "Chave primária da tabela de fatos"
         tests:
           - unique
           - not_null
+      - name: quantidade_leitos_ocupados
+        description: "Número de leitos ocupados"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 10000

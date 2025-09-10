@@ -2,7 +2,12 @@ name: 'COVID19'
 version: '1.0.0'
 config-version: 2
 
-profile: 'default'
+# Use environment variable for profile selection (defaults to 'default' for backward compatibility)
+profile: "{{ env_var('DBT_PROFILE', 'default') }}"
+
+# Security: Enable query comments for better audit trails
+query-comment: |
+  dbt:{{ dbt_version }};project:{{ project_name }};target:{{ target.name }};run_id:{{ invocation_id }}
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -18,18 +23,36 @@ clean-targets:
 
 models:
   COVID19:
+    # Staging layer (Bronze) - Raw data cleaning
     staging:
       +materialized: view
       +schema: bronze
+      +meta:
+        layer: "bronze"
+        data_classification: "sensitive"
 
+    # Intermediate layer (Silver) - Business logic
     intermediate:
       +materialized: table
       +schema: silver
+      +meta:
+        layer: "silver"
+        data_classification: "sensitive"
 
+    # Dimension tables (Gold) - Reference data
     dimensions:
       +materialized: table
       +schema: gold
+      +meta:
+        layer: "gold"
+        data_classification: "public"
 
+    # Fact tables (Gold) - Metrics and measures
     facts:
       +materialized: incremental
       +schema: gold
+      +unique_key: 'id_fato'
+      +on_schema_change: 'fail'  # Security: Prevent unexpected schema changes
+      +meta:
+        layer: "gold"
+        data_classification: "sensitive"
