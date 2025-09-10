@@ -28,14 +28,4 @@ SELECT
     municipio,
     localidade_completa
 FROM localidades_limpas
-
-UNION ALL
-
--- Adiciona entrada padrão para casos não informados
-SELECT
-    -1 AS id_localidade,
-    'NÃO INFORMADO' AS estado,
-    'NÃO INFORMADO' AS municipio,
-    'Localização não informada' AS localidade_completa
-
-ORDER BY id_localidade, estado, municipio
+ORDER BY estado, municipio

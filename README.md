@@ -1245,10 +1245,11 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 - **Função:** Fornece visibilidade detalhada sobre problemas sem bloquear pipeline
 - **Execução:** `dbt run --select data_integrity_monitoring`
 
-**3. Teste de Integridade Silver (Rigoroso)**
+**3. Teste de Integridade Silver (Tolerante)**
 - **Arquivo:** `tests/test_silver_layer_integrity.sql`
-- **Função:** Tolerância zero para problemas na camada intermediate
-- **Verifica:** Todos os campos essenciais devem estar presentes
+- **Função:** Permite problemas menores na camada intermediate (<10% dos registros)
+- **Verifica:** Campos absolutamente críticos (id_registro, ano_dados)
+- **Estratégia:** Tolerância para problemas de JOIN e dados menores faltantes
 
 **4. Teste de Integridade Gold (Crítico)**
 - **Arquivo:** `tests/test_gold_layer_critical_integrity.sql`
