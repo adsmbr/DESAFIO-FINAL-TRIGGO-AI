@@ -1221,6 +1221,12 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 - ✅ Adicionado campo `localidade_completa` para melhor usabilidade
 - ✅ Melhoradas validações para excluir registros vazios
 - ✅ Formatação consistente de estados e municípios
+- ✅ **NOVO:** Localidade padrão (id_localidade = -1) para casos não informados
+
+**Camada Intermediate (`int_leitos_ocupacao_unificado.sql`):**
+- ✅ **NOVO:** Estratégia tolerante para JOINs com dimensões
+- ✅ **NOVO:** Garantia de id_localidade sempre preenchido (usa -1 se não encontrado)
+- ✅ **NOVO:** Lógica de fallback para evitar registros com chaves nulas
 
 #### 🔍 Novos Testes de Qualidade Implementados
 
@@ -1276,6 +1282,9 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 ```bash
 # Executar monitoramento de integridade (não bloqueante)
 dbt run --select data_integrity_monitoring
+
+# Executar investigação da camada Silver
+dbt run --select silver_layer_investigation
 
 # Executar testes por camada
 dbt test --select test_consolidado_data_integrity  # Bronze (tolerante)
