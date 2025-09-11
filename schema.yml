@@ -9,8 +9,13 @@ sources:
       data_classification: "sensitive"
       source_system: "DataSUS"
     tables:
+      - name: RAW_LEITO_OCUPACAO_2020
       - name: RAW_LEITO_OCUPACAO_2021
+<<<<<<< HEAD
         description: "Dados brutos de ocupação de leitos - 2021"
+=======
+      - name: RAW_LEITO_OCUPACAO_2022
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
       - name: RAW_MUNICIPIOS_IBGE
         description: "Dados de municípios brasileiros - IBGE"
       - name: RAW_ESTABELECIMENTOS_CNES
@@ -22,15 +27,20 @@ sources:
 
 models:
   - name: stg_leito_ocupacao_consolidado
+<<<<<<< HEAD
     description: "Modelo de staging que consolida dados de ocupação de leitos de todos os anos (2020-2022)"
     meta:
       layer: "bronze"
       data_classification: "sensitive"
       test_strategy: "tolerant" # Permite alguns problemas menores na camada de staging
+=======
+    description: "Dados consolidados de ocupação de leitos de todos os anos (2020-2022)"
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
     columns:
       - name: id_registro
         description: "Identificador único do registro"
         tests:
+<<<<<<< HEAD
           - unique:
               config:
                 severity: warn  # Não bloqueia em staging
@@ -57,6 +67,34 @@ models:
               values: [2020, 2021, 2022]
               config:
                 severity: error  # Bloqueia se ano inválido
+=======
+          - unique
+          - not_null
+      - name: data_notificacao
+        description: "Data da notificação"
+        tests:
+          - not_null
+      - name: cnes
+        description: "Código CNES do estabelecimento"
+        tests:
+          - not_null
+
+  - name: int_leitos_ocupacao_unificado
+    description: "Modelo intermediário que enriquece dados de staging com chaves de dimensões"
+    columns:
+      - name: id_registro
+        description: "Identificador único do registro"
+        tests:
+          - unique
+          - not_null
+      - name: id_localidade
+        description: "Chave estrangeira para dimensão localidade"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localidade')
+              field: id_localidade
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
 
   - name: dim_tempo
     description: "Dimensão temporal com informações detalhadas sobre datas"
@@ -72,6 +110,7 @@ models:
       - name: data
         description: "Data no formato DATE"
         tests:
+<<<<<<< HEAD
           - not_null
       - name: ano
         description: "Ano extraído da data"
@@ -88,6 +127,9 @@ models:
       - name: semana_do_ano
         description: "Semana do ano (1-53)"
         tests:
+=======
+          - unique
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
           - not_null
 
   - name: dim_localidade
@@ -109,8 +151,52 @@ models:
         description: "Nome do município"
         tests:
           - not_null
+<<<<<<< HEAD
       - name: localidade_completa
         description: "Localidade formatada como 'Município - Estado'"
+=======
+
+  - name: dim_ocupacao_tipo
+    description: "Dimensão com tipos de ocupação de leitos"
+    columns:
+      - name: id_ocupacao_tipo
+        description: "Chave primária da dimensão tipo ocupação"
+        tests:
+          - unique
+          - not_null
+      - name: tipo_ocupacao
+        description: "Tipo de ocupação (COVID, Hospitalar, etc.)"
+        tests:
+          - not_null
+      - name: tipo_leito
+        description: "Tipo de leito (Clínico, UTI)"
+        tests:
+          - not_null
+
+  - name: dim_unidade_saude
+    description: "Dimensão de unidades de saúde (CNES)"
+    columns:
+      - name: id_unidade_saude
+        description: "Código CNES da unidade de saúde"
+        tests:
+          - unique
+          - not_null
+      - name: nome_unidade
+        description: "Nome da unidade de saúde"
+        tests:
+          - not_null
+
+  - name: dim_cnes
+    description: "Dimensão de estabelecimentos CNES com nomes"
+    columns:
+      - name: id_cnes
+        description: "Código CNES do estabelecimento"
+        tests:
+          - unique
+          - not_null
+      - name: nm_estabelecimento
+        description: "Nome do estabelecimento"
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
         tests:
           - not_null
 
@@ -127,6 +213,7 @@ models:
         tests:
           - unique
           - not_null
+<<<<<<< HEAD
       - name: quantidade_leitos_ocupados
         description: "Número de leitos ocupados"
         tests:
@@ -171,3 +258,25 @@ models:
         description: "Status do problema com indicadores visuais"
       - name: checked_at
         description: "Timestamp da verificação"
+=======
+      - name: id_tempo
+        description: "Chave estrangeira para dimensão tempo"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tempo')
+              field: id_tempo
+      - name: id_localidade
+        description: "Chave estrangeira para dimensão localidade"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localidade')
+              field: id_localidade
+      - name: quantidade_leitos_ocupados
+        description: "Quantidade de leitos ocupados"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+>>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
