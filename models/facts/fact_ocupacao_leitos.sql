@@ -63,8 +63,8 @@ SELECT
 
 FROM unpivoted_data u
 
--- Join para buscar o id_tempo da dimensão de data
-JOIN {{ ref('dim_data') }} t ON DATE(u.data_notificacao) = t.data
+-- Join para buscar o id_tempo da dimensão de tempo
+JOIN {{ ref('dim_tempo') }} t ON DATE(u.data_notificacao) = t.data
 
 -- Join para buscar o id_ocupacao_tipo da dimensão de tipos
 JOIN {{ ref('dim_ocupacao_tipo') }} ot ON u.tipo_ocupacao = ot.tipo_ocupacao AND u.tipo_leito = ot.tipo_leito

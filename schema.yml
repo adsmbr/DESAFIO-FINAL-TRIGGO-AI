@@ -5,16 +5,56 @@ sources:
     database: COVID19
     schema: BRONZE
     tables:
+      - name: RAW_LEITO_OCUPACAO_2020
       - name: RAW_LEITO_OCUPACAO_2021
+      - name: RAW_LEITO_OCUPACAO_2022
       - name: RAW_MUNICIPIOS_IBGE
       - name: RAW_ESTABELECIMENTOS_CNES
 
 models:
+  - name: stg_leito_ocupacao_consolidado
+    description: "Dados consolidados de ocupação de leitos de todos os anos (2020-2022)"
+    columns:
+      - name: id_registro
+        description: "Identificador único do registro"
+        tests:
+          - unique
+          - not_null
+      - name: data_notificacao
+        description: "Data da notificação"
+        tests:
+          - not_null
+      - name: cnes
+        description: "Código CNES do estabelecimento"
+        tests:
+          - not_null
+
+  - name: int_leitos_ocupacao_unificado
+    description: "Modelo intermediário que enriquece dados de staging com chaves de dimensões"
+    columns:
+      - name: id_registro
+        description: "Identificador único do registro"
+        tests:
+          - unique
+          - not_null
+      - name: id_localidade
+        description: "Chave estrangeira para dimensão localidade"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localidade')
+              field: id_localidade
+
   - name: dim_tempo
     description: "Dimensão temporal com informações detalhadas sobre datas"
     columns:
       - name: id_tempo
         description: "Chave primária da dimensão tempo"
+        tests:
+          - unique
+          - not_null
+      - name: data
+        description: "Data no formato DATE"
         tests:
           - unique
           - not_null
@@ -27,6 +67,57 @@ models:
         tests:
           - unique
           - not_null
+      - name: estado
+        description: "Nome do estado"
+        tests:
+          - not_null
+      - name: municipio
+        description: "Nome do município"
+        tests:
+          - not_null
+
+  - name: dim_ocupacao_tipo
+    description: "Dimensão com tipos de ocupação de leitos"
+    columns:
+      - name: id_ocupacao_tipo
+        description: "Chave primária da dimensão tipo ocupação"
+        tests:
+          - unique
+          - not_null
+      - name: tipo_ocupacao
+        description: "Tipo de ocupação (COVID, Hospitalar, etc.)"
+        tests:
+          - not_null
+      - name: tipo_leito
+        description: "Tipo de leito (Clínico, UTI)"
+        tests:
+          - not_null
+
+  - name: dim_unidade_saude
+    description: "Dimensão de unidades de saúde (CNES)"
+    columns:
+      - name: id_unidade_saude
+        description: "Código CNES da unidade de saúde"
+        tests:
+          - unique
+          - not_null
+      - name: nome_unidade
+        description: "Nome da unidade de saúde"
+        tests:
+          - not_null
+
+  - name: dim_cnes
+    description: "Dimensão de estabelecimentos CNES com nomes"
+    columns:
+      - name: id_cnes
+        description: "Código CNES do estabelecimento"
+        tests:
+          - unique
+          - not_null
+      - name: nm_estabelecimento
+        description: "Nome do estabelecimento"
+        tests:
+          - not_null
 
   - name: fact_ocupacao_leitos
     description: "Tabela de fatos com métricas de ocupação de leitos"
@@ -36,3 +127,23 @@ models:
         tests:
           - unique
           - not_null
+      - name: id_tempo
+        description: "Chave estrangeira para dimensão tempo"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tempo')
+              field: id_tempo
+      - name: id_localidade
+        description: "Chave estrangeira para dimensão localidade"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localidade')
+              field: id_localidade
+      - name: quantidade_leitos_ocupados
+        description: "Quantidade de leitos ocupados"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0

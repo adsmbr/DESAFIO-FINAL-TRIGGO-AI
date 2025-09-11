@@ -1,0 +1,16 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5173",
+  "backendAuthType": "public",
+  "executionArgs": {
+    "projectName": "DESAFIO-FINAL-TRIGGO-AI",
+    "projectPath": "C:\\Users\\aliss\\OneDrive\\Área de Trabalho\\Projetos Trae\\Triggo\\DESAFIO-FINAL-TRIGGO-AI",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-TkfxGciIpMLfRl2f7XF8wir2fxq5WLQzcUv4biE3aQfZtDBBdStn7unyou51WM3gufX94f6NvGRKI6he-W2coEBLz9HXJZGyGsRR3HnEX2G_NcxpMVbU_hD67SkeP3r59pU"
+    }
+  }
+}

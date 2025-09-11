@@ -1,0 +1,116 @@
+{
+  "tech_stack": ["SQL", "dbt", "Snowflake", "YAML", "Git"],
+  "features": [
+    {
+      "name": "COVID19 Data Pipeline",
+      "description": "Complete data transformation pipeline for COVID-19 hospital bed occupancy data from 2020-2022 using dbt and Snowflake",
+      "files": ["dbt_project.yml", "models/staging/", "models/intermediate/", "models/dimensions/", "models/facts/"],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "COVID19 Data Pipeline",
+          "description": "Data transformation pipeline for hospital bed occupancy analysis",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/models/staging": {
+            "get": {
+              "summary": "Bronze layer data staging",
+              "description": "Raw data ingestion and basic cleaning from DataSUS sources",
+              "responses": {
+                "200": {
+                  "description": "Staged data ready for transformation"
+                }
+              }
+            }
+          },
+          "/models/intermediate": {
+            "get": {
+              "summary": "Silver layer data processing",
+              "description": "Intermediate transformations and data enrichment",
+              "responses": {
+                "200": {
+                  "description": "Processed data with business logic applied"
+                }
+              }
+            }
+          },
+          "/models/dimensions": {
+            "get": {
+              "summary": "Gold layer dimensional modeling",
+              "description": "Star schema dimensions for time, location, and health units",
+              "responses": {
+                "200": {
+                  "description": "Dimensional tables ready for analytics"
+                }
+              }
+            }
+          },
+          "/models/facts": {
+            "get": {
+              "summary": "Gold layer fact tables",
+              "description": "Fact table with bed occupancy metrics and foreign keys to dimensions",
+              "responses": {
+                "200": {
+                  "description": "Fact table ready for BI consumption"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Data Quality Tests",
+      "description": "Comprehensive data quality validation including referential integrity, null checks, and custom business rules",
+      "files": ["schema.yml", "tests/test_no_future_dates.sql"],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Data Quality Tests",
+          "description": "Automated data quality validation and testing framework",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/tests/data-quality": {
+            "get": {
+              "summary": "Execute data quality tests",
+              "description": "Run comprehensive data validation tests including uniqueness, null checks, and referential integrity",
+              "responses": {
+                "200": {
+                  "description": "Test results"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Schema Generation Macros",
+      "description": "dbt macros for dynamic schema naming and code reusability across the data pipeline",
+      "files": ["macros/generate_schema_name.sql"],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Schema Macros",
+          "description": "Reusable macros for schema management",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/macros/schema-generation": {
+            "get": {
+              "summary": "Generate schema names",
+              "description": "Dynamically generates schema names based on environment and configuration",
+              "responses": {
+                "200": {
+                  "description": "Generated schema name"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

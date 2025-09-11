@@ -1,0 +1,37 @@
+[
+  {
+    "id": "TC001",
+    "title": "get_consolidated_bed_occupancy_data",
+    "description": "Test the API endpoint /staging/bed-occupancy to verify it returns cleaned and standardized hospital bed occupancy data from all years with correct fields and data types."
+  },
+  {
+    "id": "TC002",
+    "title": "get_time_dimension_data",
+    "description": "Test the API endpoint /dimensions/time to ensure it returns detailed time dimension data including day, month, year, and quarter information correctly."
+  },
+  {
+    "id": "TC003",
+    "title": "get_geographic_dimension_data",
+    "description": "Test the API endpoint /dimensions/location to verify it returns accurate state and municipality information for geographic analysis."
+  },
+  {
+    "id": "TC004",
+    "title": "get_bed_occupancy_fact_data",
+    "description": "Test the API endpoint /facts/bed-occupancy to confirm it returns aggregated hospital bed occupancy metrics with correct dimensional keys."
+  },
+  {
+    "id": "TC005",
+    "title": "get_unified_occupancy_data",
+    "description": "Test the API endpoint /integration/unified-occupancy to verify it returns integrated and enriched bed occupancy data from the silver layer."
+  },
+  {
+    "id": "TC006",
+    "title": "run_data_quality_tests",
+    "description": "Test the API endpoint /tests/data-quality to ensure it executes all configured data quality tests and returns accurate test results indicating data integrity and business rule compliance."
+  },
+  {
+    "id": "TC007",
+    "title": "generate_schema_names",
+    "description": "Test the API endpoint /macros/schema-generation to verify it dynamically generates schema names based on environment and configuration parameters."
+  }
+]
