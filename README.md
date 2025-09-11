@@ -272,12 +272,9 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 ```sql
 .
 ├── dbt_project.yml          # O "cérebro" do projeto: configurações gerais.
-<<<<<<< HEAD
 ├── SECURITY.md              # NOVO: Diretrizes de segurança e melhores práticas.
 ├── VALIDATION.md             # NOVO: Guia de validação de deployment.
-=======
 ├── packages.yml             # ✅ Dependências do dbt (dbt_utils)
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
 ├── macros/                  # Pequenos programas que automatizam tarefas.
 │   └── generate_schema_name.sql # Macro para definir nomes de esquemas.
 ├── models/                  # Onde ficam os arquivos SQL que transformam os dados.
@@ -290,39 +287,33 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 │   ├── intermediate/        # Modelos da camada SILVER.
 │   │   └── int_leitos_ocupacao_unificado.sql # ✅ Documentado no schema.yml
 │   ├── dimensions/          # Modelos de dimensão da camada GOLD.
-<<<<<<< HEAD
-│   │   ├── dim_cnes.sql
-│   │   ├── dim_data.sql
-│   │   ├── dim_localidade.sql
-│   │   ├── dim_ocupacao_tipo.sql
-│   │   ├── dim_tempo.sql
-│   │   └── dim_unidade_saude.sql
+│   │   ├── dim_cnes.sql     # ✅ Documentado no schema.yml
+│   │   ├── dim_localidade.sql # ✅ Corrigido (conflitos de merge resolvidos)
+│   │   ├── dim_ocupacao_tipo.sql # ✅ Documentado no schema.yml
+│   │   ├── dim_tempo.sql    # ✅ Modelo principal de tempo
+│   │   └── dim_unidade_saude.sql # ✅ Documentado no schema.yml
 │   ├── facts/               # Modelos de fatos da camada GOLD.
-│   │   └── fact_ocupacao_leitos.sql
+│   │   └── fact_ocupacao_leitos.sql # ✅ Referências corrigidas
 │   └── monitoring/          # NOVO: Modelos de monitoramento de qualidade.
-│       └── data_quality_summary.sql
+│       ├── data_quality_summary.sql
+│       ├── data_integrity_monitoring.sql
+│       ├── silver_diagnostic.sql
+│       ├── silver_layer_investigation.sql
+│       └── silver_quality_monitor.sql
 ├── tests/                   # Onde ficam os testes para garantir a qualidade dos dados.
 │   ├── test_no_future_dates.sql
 │   ├── test_critical_data_issues.sql    # NOVO: Testes críticos de qualidade.
 │   ├── test_data_quality_comprehensive.sql # NOVO: Testes abrangentes.
 │   ├── test_consolidado_data_integrity.sql # NOVO: Integridade de dados consolidados.
+│   ├── test_gold_layer_critical_integrity.sql # NOVO: Integridade camada gold.
+│   ├── test_silver_layer_integrity.sql # NOVO: Integridade camada silver.
 │   └── test_unique_id_across_years.sql # NOVO: Unicidade de IDs entre anos.
 ├── analyses/                # NOVO: Consultas de investigação e análise.
 │   └── data_quality_investigation.sql
-└── schema.yml               # Documentação e testes para os modelos.
-=======
-│   │   ├── dim_cnes.sql     # ✅ Documentado no schema.yml
-│   │   ├── dim_localidade.sql # ✅ Corrigido (sintaxe SQL)
-│   │   ├── dim_ocupacao_tipo.sql # ✅ Documentado no schema.yml
-│   │   ├── dim_tempo.sql    # ✅ Modelo principal de tempo (dim_data removido)
-│   │   └── dim_unidade_saude.sql # ✅ Documentado no schema.yml
-│   └── facts/               # Modelos de fatos da camada GOLD.
-│       └── fact_ocupacao_leitos.sql # ✅ Referências corrigidas
-├── tests/                   # Onde ficam os testes para garantir a qualidade dos dados.
-│   ├── test_no_future_dates.sql
-│   └── schema.yml           # ✅ EXPANDIDO: Documentação completa + testes
-└── RELATORIO_CORRECOES.md   # 📋 NOVO: Relatório detalhado das correções
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
+├── SECURITY.md              # NOVO: Diretrizes de segurança e melhores práticas.
+├── VALIDATION.md            # NOVO: Guia de validação de deployment.
+├── RELATORIO_CORRECOES.md   # 📋 NOVO: Relatório detalhado das correções.
+└── schema.yml               # ✅ EXPANDIDO: Documentação completa + testes
 ```
 
 ### 🔍 Principais Correções na Estrutura:
@@ -1418,9 +1409,6 @@ LIMIT 5;
 
 Insight: Esta consulta identifica os cinco hospitais com a maior taxa de altas confirmadas em 2021. Essa informação é vital para entender a eficiência e o sucesso de tratamentos em diferentes unidades de saúde, permitindo a identificação de melhores práticas.
 
-<<<<<<< HEAD
-## 11. Link para o dbt Docs gerado
-=======
 ## 🧪 Testes e Qualidade de Dados
 
 ### Testes Implementados ✅
@@ -1458,8 +1446,7 @@ dbt test --select test_type:relationships
 - ✅ **Taxa de Sucesso:** Todos os testes passando
 - 📈 **Monitoramento:** Testes executados a cada build
 
-## 9. Link para o dbt Docs gerado
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
+## 11. Link para o dbt Docs gerado
 https://adsmbr.github.io/DESAFIO-FINAL-TRIGGO-AI/#!/overview
 
 ## 🚀 Próximos Passos e Recomendações

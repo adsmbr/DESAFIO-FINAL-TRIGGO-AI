@@ -10,37 +10,27 @@ sources:
       source_system: "DataSUS"
     tables:
       - name: RAW_LEITO_OCUPACAO_2020
+        description: "Dados brutos de ocupação de leitos - 2020"
       - name: RAW_LEITO_OCUPACAO_2021
-<<<<<<< HEAD
         description: "Dados brutos de ocupação de leitos - 2021"
-=======
       - name: RAW_LEITO_OCUPACAO_2022
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
+        description: "Dados brutos de ocupação de leitos - 2022"
       - name: RAW_MUNICIPIOS_IBGE
         description: "Dados de municípios brasileiros - IBGE"
       - name: RAW_ESTABELECIMENTOS_CNES
         description: "Dados de estabelecimentos de saúde - CNES"
-      - name: RAW_LEITO_OCUPACAO_2020
-        description: "Dados brutos de ocupação de leitos - 2020"
-      - name: RAW_LEITO_OCUPACAO_2022
-        description: "Dados brutos de ocupação de leitos - 2022"
 
 models:
   - name: stg_leito_ocupacao_consolidado
-<<<<<<< HEAD
     description: "Modelo de staging que consolida dados de ocupação de leitos de todos os anos (2020-2022)"
     meta:
       layer: "bronze"
       data_classification: "sensitive"
       test_strategy: "tolerant" # Permite alguns problemas menores na camada de staging
-=======
-    description: "Dados consolidados de ocupação de leitos de todos os anos (2020-2022)"
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
     columns:
       - name: id_registro
         description: "Identificador único do registro"
         tests:
-<<<<<<< HEAD
           - unique:
               config:
                 severity: warn  # Não bloqueia em staging
@@ -67,17 +57,6 @@ models:
               values: [2020, 2021, 2022]
               config:
                 severity: error  # Bloqueia se ano inválido
-=======
-          - unique
-          - not_null
-      - name: data_notificacao
-        description: "Data da notificação"
-        tests:
-          - not_null
-      - name: cnes
-        description: "Código CNES do estabelecimento"
-        tests:
-          - not_null
 
   - name: int_leitos_ocupacao_unificado
     description: "Modelo intermediário que enriquece dados de staging com chaves de dimensões"
@@ -94,12 +73,11 @@ models:
           - relationships:
               to: ref('dim_localidade')
               field: id_localidade
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
 
   - name: dim_tempo
     description: "Dimensão temporal com informações detalhadas sobre datas"
     meta:
-      layer: "gold"
+      layer: "silver"
       data_classification: "public"
     columns:
       - name: id_tempo
@@ -107,35 +85,30 @@ models:
         tests:
           - unique
           - not_null
-      - name: data
-        description: "Data no formato DATE"
+      - name: data_completa
+        description: "Data no formato YYYY-MM-DD"
         tests:
-<<<<<<< HEAD
+          - unique
           - not_null
       - name: ano
-        description: "Ano extraído da data"
+        description: "Ano (YYYY)"
+        tests:
+          - not_null
+      - name: mes
+        description: "Mês (1-12)"
         tests:
           - not_null
           - accepted_values:
-              values: [2020, 2021, 2022]
-      - name: trimestre
-        description: "Trimestre do ano (1-4)"
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      - name: dia
+        description: "Dia do mês (1-31)"
         tests:
-          - not_null
-          - accepted_values:
-              values: [1, 2, 3, 4]
-      - name: semana_do_ano
-        description: "Semana do ano (1-53)"
-        tests:
-=======
-          - unique
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
           - not_null
 
   - name: dim_localidade
-    description: "Dimensão geográfica com estados e municípios"
+    description: "Dimensão geográfica com estados e municípios brasileiros"
     meta:
-      layer: "gold"
+      layer: "silver"
       data_classification: "public"
     columns:
       - name: id_localidade
@@ -151,33 +124,24 @@ models:
         description: "Nome do município"
         tests:
           - not_null
-<<<<<<< HEAD
       - name: localidade_completa
-        description: "Localidade formatada como 'Município - Estado'"
-=======
-
-  - name: dim_ocupacao_tipo
-    description: "Dimensão com tipos de ocupação de leitos"
-    columns:
-      - name: id_ocupacao_tipo
-        description: "Chave primária da dimensão tipo ocupação"
-        tests:
-          - unique
-          - not_null
-      - name: tipo_ocupacao
-        description: "Tipo de ocupação (COVID, Hospitalar, etc.)"
-        tests:
-          - not_null
-      - name: tipo_leito
-        description: "Tipo de leito (Clínico, UTI)"
+        description: "Descrição completa da localidade (município - estado)"
         tests:
           - not_null
 
   - name: dim_unidade_saude
-    description: "Dimensão de unidades de saúde (CNES)"
+    description: "Dimensão de unidades de saúde baseada no CNES"
+    meta:
+      layer: "silver"
+      data_classification: "sensitive"
     columns:
       - name: id_unidade_saude
-        description: "Código CNES da unidade de saúde"
+        description: "Chave primária da dimensão unidade de saúde"
+        tests:
+          - unique
+          - not_null
+      - name: cnes
+        description: "Código CNES da unidade"
         tests:
           - unique
           - not_null
@@ -186,79 +150,51 @@ models:
         tests:
           - not_null
 
-  - name: dim_cnes
-    description: "Dimensão de estabelecimentos CNES com nomes"
+  - name: dim_ocupacao_tipo
+    description: "Dimensão de tipos de ocupação de leitos"
+    meta:
+      layer: "silver"
+      data_classification: "public"
     columns:
-      - name: id_cnes
-        description: "Código CNES do estabelecimento"
+      - name: id_ocupacao_tipo
+        description: "Chave primária da dimensão tipo de ocupação"
         tests:
           - unique
           - not_null
-      - name: nm_estabelecimento
-        description: "Nome do estabelecimento"
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
+      - name: tipo_ocupacao
+        description: "Tipo de ocupação do leito"
         tests:
+          - not_null
+
+  - name: dim_cnes
+    description: "Dimensão de estabelecimentos CNES"
+    meta:
+      layer: "silver"
+      data_classification: "sensitive"
+    columns:
+      - name: id_cnes
+        description: "Chave primária da dimensão CNES"
+        tests:
+          - unique
+          - not_null
+      - name: cnes
+        description: "Código CNES"
+        tests:
+          - unique
           - not_null
 
   - name: fact_ocupacao_leitos
-    description: "Tabela de fatos com métricas de ocupação de leitos"
+    description: "Tabela fato principal com dados de ocupação de leitos"
     meta:
       layer: "gold"
       data_classification: "sensitive"
-      contains_pii: false
-      retention_period: "7_years"
+      test_strategy: "strict" # Testes rigorosos na camada gold
     columns:
       - name: id_fato
-        description: "Chave primária da tabela de fatos"
+        description: "Chave primária da tabela fato"
         tests:
           - unique
           - not_null
-<<<<<<< HEAD
-      - name: quantidade_leitos_ocupados
-        description: "Número de leitos ocupados"
-        tests:
-          - not_null
-
-  - name: data_integrity_monitoring
-    description: "Modelo de monitoramento para problemas de integridade de dados"
-    meta:
-      layer: "monitoring"
-      data_classification: "internal"
-      purpose: "Fornece visibilidade sobre problemas de qualidade sem bloquear pipeline"
-    columns:
-      - name: check_type
-        description: "Tipo de verificação realizada"
-      - name: error_type
-        description: "Tipo específico de erro identificado"
-      - name: total_registros
-        description: "Número de registros afetados pelo problema"
-      - name: percentual_afetado
-        description: "Percentual dos dados afetados pelo problema"
-      - name: status_visual
-        description: "Status visual do problema (✅ OK, ⚠️ Atenção, 🚨 Ação)"
-      - name: verificado_em
-        description: "Timestamp da última verificação"
-
-  - name: silver_layer_investigation
-    description: "Modelo de investigação para problemas na camada Silver (intermediate)"
-    meta:
-      layer: "monitoring"
-      data_classification: "internal"
-      purpose: "Identifica problemas de JOIN e integridade na camada intermediate"
-    columns:
-      - name: check_type
-        description: "Tipo de análise (SILVER_LAYER_ISSUE ou LOCALITY_ANALYSIS)"
-      - name: problem_type
-        description: "Tipo específico de problema identificado"
-      - name: affected_records
-        description: "Número de registros afetados"
-      - name: percentage_affected
-        description: "Percentual dos dados afetados"
-      - name: status
-        description: "Status do problema com indicadores visuais"
-      - name: checked_at
-        description: "Timestamp da verificação"
-=======
       - name: id_tempo
         description: "Chave estrangeira para dimensão tempo"
         tests:
@@ -273,10 +209,34 @@ models:
           - relationships:
               to: ref('dim_localidade')
               field: id_localidade
-      - name: quantidade_leitos_ocupados
-        description: "Quantidade de leitos ocupados"
+      - name: id_unidade_saude
+        description: "Chave estrangeira para dimensão unidade de saúde"
         tests:
           - not_null
-          - dbt_utils.accepted_range:
-              min_value: 0
->>>>>>> 7c846bdd4ec2a2c2bb6f86b8c2099aed5f344ef3
+          - relationships:
+              to: ref('dim_unidade_saude')
+              field: id_unidade_saude
+      - name: leitos_covid_ocupados
+        description: "Número de leitos COVID ocupados"
+        tests:
+          - not_null
+      - name: leitos_covid_livres
+        description: "Número de leitos COVID livres"
+        tests:
+          - not_null
+      - name: leitos_uti_ocupados
+        description: "Número de leitos UTI ocupados"
+        tests:
+          - not_null
+      - name: leitos_uti_livres
+        description: "Número de leitos UTI livres"
+        tests:
+          - not_null
+      - name: taxa_ocupacao_covid
+        description: "Taxa de ocupação de leitos COVID (%)"
+        tests:
+          - not_null
+      - name: taxa_ocupacao_uti
+        description: "Taxa de ocupação de leitos UTI (%)"
+        tests:
+          - not_null
