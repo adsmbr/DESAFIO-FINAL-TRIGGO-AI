@@ -718,7 +718,7 @@ SELECT
     s.saida_confirmada_altas,
     u.updated_at
 FROM unpivoted_data u
-JOIN {{ ref('dim_data') }} t ON DATE(u.data_notificacao) = t.data
+JOIN {{ ref('dim_tempo') }} t ON DATE(u.data_notificacao) = t.data
 JOIN {{ ref('dim_ocupacao_tipo') }} ot ON u.tipo_ocupacao = ot.tipo_ocupacao AND u.tipo_leito = ot.tipo_leito
 LEFT JOIN saidas_data s ON u.id_registro = s.id_registro
 WHERE u.ocupacao > 0
@@ -1184,7 +1184,7 @@ Em 2025-09-10, o projeto foi submetido a testes abrangentes utilizando o TestSpr
 
 #### 📊 Modelos de Dados Aprimorados
 
-**Dimensão de Data (`dim_data.sql`):**
+**Dimensão de Tempo (`dim_tempo.sql`):**
 - ✅ Adicionados campos `trimestre` e `semana_do_ano` para análises temporais mais granulares
 - ✅ Melhorada filtragem para excluir datas nulas
 - ✅ Documentação atualizada com testes para novos campos
