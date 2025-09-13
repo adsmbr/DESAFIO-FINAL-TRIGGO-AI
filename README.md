@@ -18,11 +18,11 @@ O resultado final é um Modelo Dimensional (Star Schema) na camada GOLD, pronto 
 ### 🔧 Melhorias Recentes Implementadas
 
 - ✅ **Correções de Sintaxe:** Todos os erros de SQL foram identificados e corrigidos
-- ✅ **Referências Consistentes:** Padronização de referências entre modelos (dim_tempo vs dim_data)
+- ✅ **Referências Consistentes:** Padronização de referências entre modelos (uso exclusivo de dim_tempo)
 - ✅ **Documentação Completa:** Schema.yml expandido com testes e documentação abrangente
 - ✅ **Testes de Qualidade:** Implementados testes de integridade referencial e validação de dados
 - ✅ **Sources Completas:** Adicionadas todas as tabelas source (2020, 2021, 2022)
-- ✅ **Remoção de Duplicações:** Eliminados modelos duplicados (dim_data removido)
+- ✅ **Remoção de Duplicações:** Eliminado modelo duplicado dim_data.sql
 - ✅ **Compatibilidade dbt Cloud:** Verificada e garantida compatibilidade total
 
 ### 1.1 O Que é Este Projeto?
@@ -317,7 +317,7 @@ O projeto é organizado em pastas para manter tudo em ordem. A estrutura é simp
 ```
 
 ### 🔍 Principais Correções na Estrutura:
-- ❌ **Removido:** `dim_data.sql` (duplicação com `dim_tempo.sql`)
+- ❌ **Removido:** `dim_data.sql` (duplicação desnecessária com `dim_tempo.sql`)
 - ✅ **Corrigido:** Referências inconsistentes entre modelos
 - ✅ **Expandido:** `schema.yml` com documentação completa e testes
 - ✅ **Adicionado:** Sources para todos os anos (2020, 2021, 2022)
@@ -570,27 +570,7 @@ FROM
 LEFT JOIN
     estabelecimentos_cnes cnes ON c.id_cnes = cnes.id_cnes
 ```
-```sql
-dim_data.sql:
 
--- Este modelo cria a dimensão de tempo.
-
--- Pega todas as datas únicas dos dados de leitos consolidados.
-WITH datas_distintas AS (
-    SELECT DISTINCT CAST(data_notificacao AS DATE) AS data
-    FROM {{ ref('stg_leito_ocupacao_consolidado') }} -- Referencia o modelo consolidado.
-)
--- Cria a tabela de dimensão de tempo com várias informações sobre cada data.
-SELECT
-    TO_CHAR(data, 'YYYYMMDD')::INT AS id_tempo,
-    data,
-    EXTRACT(YEAR FROM data) AS ano,
-    EXTRACT(MONTH FROM data) AS mes,
-    EXTRACT(DAY FROM data) AS dia,
-    EXTRACT(DAYOFWEEK FROM data) AS dia_da_semana
-FROM datas_distintas
-ORDER BY data
-```
 ```sql
 dim_localidade.sql:
 
