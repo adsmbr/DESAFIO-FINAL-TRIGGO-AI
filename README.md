@@ -536,7 +536,7 @@ LEFT JOIN dim_localidade loc ON
 ```
 
 i) Modelos de Dimensão
-Estes modelos criam as tabelas de dimensão na camada GOLD. Eles foram atualizados para referenciar o modelo consolidado (stg_leito_ocupacao_consolidado) quando necessário.
+Estes modelos criam as tabelas de dimensão na camada GOLD. Os modelos dim_cnes, dim_localidade, dim_ocupacao_tipo, dim_tempo e dim_unidade_saude foram atualizados para referenciar o modelo consolidado (stg_leito_ocupacao_consolidado) quando necessário.
 ```sql
 dim_cnes.sql:
 
