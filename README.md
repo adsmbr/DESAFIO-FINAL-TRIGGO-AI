@@ -2,9 +2,9 @@
 
 ## 🚀 Status do Projeto: ATUALIZADO E CORRIGIDO ✅
 
-**Última atualização:** Dezembro 2024  
-**Status:** Todas as inconsistências foram identificadas e corrigidas  
-**Compatibilidade:** dbt Cloud ✅ | Snowflake ✅ | Testes implementados ✅
+- **Última atualização:** Setembro 2025  
+- **Status:** Todas as inconsistências foram identificadas e corrigidas  
+- **Compatibilidade:** dbt Cloud ✅ | Snowflake ✅ | Testes implementados ✅
 
 > 📋 **Relatório de Correções:** Consulte o arquivo [`RELATORIO_CORRECOES.md`](./RELATORIO_CORRECOES.md) para detalhes completos das melhorias implementadas.
 
