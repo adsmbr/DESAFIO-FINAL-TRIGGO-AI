@@ -1,11 +1,6 @@
--- models/testing/fact_ocupacao_leitos_optimized.sql
--- TESTING VERSION of fact_ocupacao_leitos with performance optimizations
--- This model is for TESTING ONLY and does not affect the main pipeline
--- It allows us to test optimizations safely before applying to production
-
 {{ config(
-    materialized='table',  -- Start as table for initial testing
-    schema='testing',       -- Isolated schema for testing
+    materialized='table',
+    schema='testing',
     tags=['testing', 'performance'],
     meta={
         'purpose': 'Performance testing version of fact_ocupacao_leitos',
@@ -13,6 +8,11 @@
         'safe_to_modify': true
     }
 ) }}
+
+-- models/testing/fact_ocupacao_leitos_optimized.sql
+-- TESTING VERSION of fact_ocupacao_leitos with performance optimizations
+-- This model is for TESTING ONLY and does not affect the main pipeline
+-- It allows us to test optimizations safely before applying to production
 
 -- Use the performance optimization macros (optional)
 -- {{ log_performance_metrics(this.name) }}
