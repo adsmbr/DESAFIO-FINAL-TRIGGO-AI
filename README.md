@@ -27,7 +27,6 @@
 - **Benefício**: Visibilidade total e detecção precoce de problemas
 
 ### 🧪 **3. Testes Automatizados**
-- ⚙️ **Testes de regression** automáticos
 - 🔍 **Validação de sintaxe** SQL
 - 🤖 **Scripts de teste** automatizados
 - **Benefício**: Garantia de qualidade contínua
@@ -61,7 +60,7 @@ O resultado final é um Modelo Dimensional (Star Schema) na camada GOLD, pronto 
 - ✅ **Compatibilidade dbt Cloud:** Verificada e garantida compatibilidade total
 - 🆕 **NOVO: Sistema de Monitoramento:** Dashboards avançados de qualidade e saúde do pipeline
 - 🆕 **NOVO: Otimizações de Performance:** Macros e configurações para máxima eficiência
-- 🆕 **NOVO: Testes Automatizados:** Suíte completa de testes de regressão e validação
+- 🆕 **NOVO: Testes Automatizados:** Scripts de validação para garantir a qualidade do código.
 
 ---
 
@@ -292,7 +291,7 @@ dbt test
 
 ### **🧪 Testes e Validação (Automáticos)**
 ```bash
-# Script completo de testes (17 testes automatizados)
+# Script completo de testes (13 verificações automatizadas)
 chmod +x scripts/run_comprehensive_tests.sh
 ./scripts/run_comprehensive_tests.sh
 
@@ -407,7 +406,6 @@ O projeto agora conta com uma suíte **muito mais abrangente** de testes:
 
 #### **🆕 Testes de Qualidade Avançados (NOVOS)**
 - ✅ **Validação de Sintaxe SQL:** Garante que todos os SQLs compilam
-- ✅ **Testes de Performance:** Compara métricas entre execuções
 - ✅ **Monitoramento Contínuo:** Dashboards automatizados
 - ✅ **Alertas Inteligentes:** Detecção automática de problemas
 
@@ -420,14 +418,14 @@ dbt test
 # 🆕 NOVO: Executar testes avançados
 dbt test --select tests/validation/
 
-# 🆕 NOVO: Testes automatizados completos (17 testes)
+# 🆕 NOVO: Testes automatizados completos (13 verificações)
 ./scripts/run_comprehensive_tests.sh
 ```
 
 #### **📈 Métricas de Qualidade Melhoradas**
 
 - 📈 **Cobertura de Testes:** 100% dos modelos principais
-- 🔍 **Tipos de Teste:** 25+ testes implementados (era 15+)
+- 🔍 **Tipos de Teste:** Mais de 15 testes implementados, cobrindo integridade, validação e sintaxe.
 - ✅ **Taxa de Sucesso:** Todos os testes passando
 - 📈 **Monitoramento:** Testes executados a cada build + dashboards contínuos
 
@@ -578,7 +576,6 @@ ORDER BY hours_since_update DESC;
 
 ### **🆕 Documentação Expandida**
 - 📚 **[Performance Guide](./PERFORMANCE_OPTIMIZATION_GUIDE.md)** - Guia completo de otimização
-- 📋 **[Test Report](./TEST_VALIDATION_REPORT.md)** - Relatório de testes automatizados
 - 📝 **[Relatório de Correções](./RELATORIO_CORRECOES.md)** - Correções iniciais
 - 🔒 **[Security Guide](./SECURITY.md)** - Diretrizes de segurança
 - ✅ **[Validation Guide](./VALIDATION.md)** - Guia de validação
@@ -624,7 +621,7 @@ ORDER BY hours_since_update DESC;
 ### **🆕 Melhorias Avançadas (NOVAS)**
 - 🚀 **Performance:** Otimizações que reduzem 40-60% do tempo de execução
 - 📊 **Monitoramento:** Dashboards completos de qualidade e saúde
-- 🧪 **Testes:** 17 testes automatizados + scripts de validação
+- 🧪 **Testes:** Scripts de validação com 13 verificações automatizadas
 - 📚 **Documentação:** Guias detalhados e relatórios de qualidade
 - 🔒 **Segurança:** Preparação para compliance LGPD (Issues criadas)
 

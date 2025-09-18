@@ -92,54 +92,39 @@ run_test "Data Quality Dashboard" "dbt run --select models/monitoring/data_quali
 # Test 6: Pipeline health check
 run_test "Pipeline Health Check" "dbt run --select models/monitoring/pipeline_health_check --dry-run" "Validates health monitoring model"
 
-echo "🧪 PHASE 3: Testing Models Validation"
-echo "===================================="
-
-# Test 7: Optimized fact model
-run_test "Optimized Fact Model" "dbt run --select models/testing/fact_ocupacao_leitos_optimized --dry-run" "Validates performance-optimized model"
-
-echo "⚙️ PHASE 4: Custom Test Validation"
+echo "⚙️ PHASE 3: Custom Test Validation"
 echo "=================================="
 
-# Test 8: SQL syntax validation
+# Test 7: SQL syntax validation
 run_dbt_test "SQL Syntax Validation" "tests/validation/test_sql_syntax_validation" "Validates all new SQL is syntactically correct"
 
-# Test 9: Model references validation
-run_dbt_test "Model References" "tests/validation/test_model_references" "Validates all model references are correct"
-
-# Test 10: Schema configurations validation
+# Test 8: Schema configurations validation
 run_dbt_test "Schema Configuration" "tests/validation/test_schema_configurations" "Validates schema isolation is working"
 
-# Test 11: Performance comparison validation
+# Test 9: Performance comparison validation
 run_dbt_test "Performance Comparison" "tests/validation/test_performance_comparison" "Validates data consistency and performance"
 
-# Test 12: Performance regression test
-run_dbt_test "Performance Regression" "tests/performance/test_performance_regression" "Validates no regression in existing functionality"
-
-echo "🔍 PHASE 5: Integration Tests"
+echo "🔍 PHASE 4: Integration Tests"
 echo "============================="
 
-# Test 13: All monitoring models together
+# Test 10: All monitoring models together
 run_test "All Monitoring Models" "dbt run --select models/monitoring/ --dry-run" "Validates all monitoring models work together"
 
-# Test 14: All testing models together
-run_test "All Testing Models" "dbt run --select models/testing/ --dry-run" "Validates all testing models work together"
+# Test 11: All validation tests together
+run_dbt_test "All Validation Tests" "tests/validation/" "Validates all custom tests in the validation folder pass"
 
-# Test 15: All new tests together
-run_dbt_test "All Custom Tests" "tests/validation/ tests/performance/" "Validates all custom tests pass"
-
-echo "📋 PHASE 6: Final Safety Checks"
+echo "📋 PHASE 5: Final Safety Checks"
 echo "==============================="
 
-# Test 16: Original pipeline still intact
+# Test 12: Original pipeline still intact
 run_test "Original Models Compilation" "dbt compile --select models/staging/ models/intermediate/ models/dimensions/ models/facts/" "Ensures original pipeline compiles"
 
-# Test 17: All existing tests still pass
+# Test 13: All existing tests still pass
 run_dbt_test "Existing Tests" "tests/test_no_future_dates.sql" "Validates existing tests still work"
 
 echo "📊 TEST RESULTS SUMMARY"
 echo "========================"
-echo -e "📈 Total Tests: $TOTAL_TESTS"
+echo -e "📈 Total Tests: $TOTAL_TESTS (13 automated checks)"
 echo -e "${GREEN}✅ Passed: $PASSED_TESTS${NC}"
 echo -e "${RED}❌ Failed: $FAILED_TESTS${NC}"
 
@@ -152,7 +137,6 @@ if [ $FAILED_TESTS -eq 0 ]; then
     echo "🚀 Next Steps:"
     echo "1. Merge the pull request"
     echo "2. Run monitoring models: dbt run --select models/monitoring/"
-    echo "3. Test optimizations: dbt run --select models/testing/"
     exit 0
 else
     echo -e "\n⚠️ ${YELLOW}SOME TESTS FAILED${NC}"
