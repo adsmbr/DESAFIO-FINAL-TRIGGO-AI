@@ -34,24 +34,6 @@ models/monitoring/pipeline_health_check.sql
 - Dashboard de qualidade de dados
 - Saúde geral do pipeline
 
-### **3. Modelo de Teste**
-```
-models/testing/fact_ocupacao_leitos_optimized.sql
-```
-**Função**: Versão otimizada para testes seguros
-- Cópia exata do modelo original
-- Esquema `testing` isolado
-- Permite testar otimizações sem risco
-
-### **4. Testes de Regression**
-```
-tests/performance/test_performance_regression.sql
-```
-**Função**: Garantir que otimizações não quebram a funcionalidade
-- Validação de volume de dados
-- Testes de integridade
-- Detecção de regressões
-
 ---
 
 ## 📈 **Como Usar as Melhorias**
@@ -71,19 +53,7 @@ dbt run --select models/monitoring/data_quality_dashboard_enhanced
 dbt run --select models/monitoring/pipeline_health_check
 ```
 
-### **Fase 2: Teste Seguro (RISCO MÍNIMO)**
-```bash
-# Teste o modelo otimizado (esquema separado)
-dbt run --select models/testing/fact_ocupacao_leitos_optimized
-
-# Execute testes de regression
-dbt test --select tests/performance/test_performance_regression
-
-# Compare com original
-dbt run --select models/monitoring/performance_baseline
-```
-
-### **Fase 3: Ativação Gradual (QUANDO ESTIVER PRONTO)**
+### **Fase 2: Ativação Gradual (QUANDO ESTIVER PRONTO)**
 
 #### **3.1. Ativar Clustering (Primeira Otimização)**
 
@@ -141,10 +111,7 @@ dbt run --select pipeline_health_check
 # Modelo original
 time dbt run --select models/facts/fact_ocupacao_leitos
 
-# Modelo otimizado (teste)
-time dbt run --select models/testing/fact_ocupacao_leitos_optimized
-
-# Compare os tempos de execução
+# Compare os tempos de execução com as otimizações ativadas
 ```
 
 ---
@@ -197,10 +164,10 @@ dbt test
 ### **Por que é 100% Seguro?**
 
 1. ✅ **Nenhum modelo original modificado**
-2. ✅ **Esquemas separados** (`monitoring`, `testing`)
+2. ✅ **Esquemas separados** (`monitoring`)
 3. ✅ **Configurações comentadas** por padrão
 4. ✅ **Rollback instantâneo** disponível
-5. ✅ **Testes de regression** implementados
+5. ✅ **Testes de validação** implementados
 
 ### **Testes Antes de Ativar**
 
@@ -219,7 +186,7 @@ dbt test                     # Executa todos os testes
 Se tiver dúvidas ou problemas:
 
 1. 🔍 Consulte os **dashboards de monitoramento**
-2. 🧪 Execute **testes de regression**
+2. 🧪 Execute **testes de validação** (`dbt test --select tests/validation/`)
 3. 🔄 Use o **plano de rollback**
 4. 📊 Analise **métricas de performance**
 
@@ -230,10 +197,9 @@ Se tiver dúvidas ou problemas:
 ### **Implementação Recomendada**
 
 1. **Semana 1**: Execute modelos de monitoramento
-2. **Semana 2**: Teste modelo otimizado
-3. **Semana 3**: Ative clustering (se resultados bons)
-4. **Semana 4**: Ative particionamento (se clustering ok)
-5. **Semana 5**: Otimize estratégia incremental
+2. **Semana 2**: Ative clustering (se resultados bons)
+3. **Semana 3**: Ative particionamento (se clustering ok)
+4. **Semana 4**: Otimize estratégia incremental
 
 ### **Melhorias Futuras** (Issues criadas)
 - 🔒 Segurança e Compliance LGPD ([Issue #33](https://github.com/adsmbr/DESAFIO-FINAL-TRIGGO-AI/issues/33))
